@@ -13,10 +13,11 @@ import java.util.Properties;
  * distinct). Matrix updates must not bump the SemVer value; version source and matrix source are
  * separate files.
  *
- * <p>v0.2.0 BREAKING: per-mode pricing floor 10k (price.hand/price.all mandatory >= 10000, scalar
- * {@code price: 25.00} invalid). Compatibility matrix unchanged — still Paper 1.18.2 (388/J17)
- * certified, same 5 mandatory + probe rows in compatibility/evidence.json (see
- * CompatibilityEvidence); floor note does not alter host/build support.
+ * <p>v0.3.0 BREAKING: floor relaxed 10k→0 (price.hand/price.all {@code >=0}), optional {@code
+ * worlds:} partial overrides per-world, and fixed {@code audit.log}. v0.2.0 BREAKING per-mode floor
+ * 10k ({@code price.hand/price.all >=10000}) superseded. Compatibility matrix unchanged — still
+ * Paper 1.18.2 (388/J17) certified, same 5 mandatory + probe rows in compatibility/evidence.json
+ * (see CompatibilityEvidence); floor/worlds/audit do not alter host/build support.
  */
 public final class SemVerSupportMatrix {
 
