@@ -66,6 +66,10 @@ messages:
 
 Reload: `/anvillink reload` (manage). Valid reload swaps atomically; invalid reload keeps the prior config and reports failure. Invalid startup disables activation until fixed. `feedback.enabled=false` silences sound/particles/message for paid `repair-success` (still gated on `amount != ZERO`); feedback failures are swallowed and never trigger compensation. Paid `Success` also appends `plugins/AnvilLink/audit.log` (`ISO_INSTANT|uuid|name|HAND/ALL|world|toPlainString|count|SUCCESS`, fixed path `CREATE|APPEND`+`mkdirs`, unbounded — rotate by renaming/deleting, cleartext IDs, operator owns GDPR).
 
+## Testing
+
+Full manual guide for `v0.3.0`: [`docs/TESTING-v0.3.0.md`](docs/TESTING-v0.3.0.md) — permisos, `config.yml` (`worlds:` + floor `>=0`), `audit.log`, feedback, tamper, y checklist.
+
 ## FAQ
 
 **Does it use NMS or modify the anvil?** No. Only public Paper/Bukkit APIs, Vault's `Economy` port, and a single relocated Adventure (MiniMessage 4.11.0) for config messages. Signs use Bukkit color strings, not MiniMessage.
