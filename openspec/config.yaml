@@ -22,11 +22,11 @@ testing:
       available: true
       tool: "JUnit 5"
     integration:
-      available: false
-      tool: "MockBukkit (planned Phase 7; pin corrected to 4.x line)"
+      available: true
+      tool: "MockBukkit"
     e2e:
       available: false
-      tool: "Real Paper smoke tests (planned Phase 7/8)"
+      tool: "Real Paper smoke (CI smoke.yml matrix)"
   coverage:
     available: false
     command: "—"           # Will be ./gradlew jacocoTestReport

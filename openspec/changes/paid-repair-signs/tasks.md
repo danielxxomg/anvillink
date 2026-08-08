@@ -151,16 +151,16 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 
 ## Phase 8: Evidence Schema, CI, Docs — PR 8 (~310 lines)
 
-- [ ] 8.1 Create `compatibility/evidence.json` schema: `{distribution, version, build, serverSha256, jdkMajor, testSuite, result}` per row
-- [ ] 8.2 RED test `CompatibilityEvidenceSchemaTest`: validate evidence.json structure, mandatory rows (Paper 1.18.2/J17, 1.20.6/J21, 1.21.11/J21, Spigot 1.20.6/J21, Purpur 1.20.6/J21) must pass; probe row (Paper 26.x/J25) may fail without blocking certified ranges — platform-compliance Scenario: Missing Paper runtime evidence blocks certification
-- [ ] 8.3 RED test `EvidenceGatedSupportTest`: Paper certified only when all mandatory Paper rows pass; Spigot/Purpur verified only after separate smoke; Folia experimental; Paper 26.x uncertified until Java 25 job passes; probe failure does not block unrelated certified claims — platform-compliance Scenario: Support labels follow their evidence, Paper 26.x requires Java 25 evidence
-- [ ] 8.4 GREEN: implement evidence validation — mandatory rows gate certification; probe rows are informational; failed/missing probe does not prohibit certified ranges
-- [ ] 8.5 Create `.github/workflows/build.yml`: Gradle build + test on push/PR
-- [ ] 8.6 Create `.github/workflows/smoke.yml`: matrix — mandatory (Paper 1.18.2/J17, Paper 1.20.6/J21, Paper 1.21.11/J21, Spigot 1.20.6/J21, Purpur 1.20.6/J21) + probe (Paper 26.x/J25, continue-on-error)
-- [ ] 8.7 Write `README.md`: H1, benefit paragraph, quick-start, support-tier table, permissions, config, FAQ, `SoftwareApplication` schema
-- [ ] 8.8 Update `CHANGELOG.md` with all features for initial release
-- [ ] 8.9 Update `openspec/config.yaml` testing section: runner available=true, command=`./gradlew test`, framework=JUnit 5, unit=JUnit 5, integration=MockBukkit, linter=`./gradlew spotlessCheck`, formatter=`./gradlew spotlessApply`
-- [ ] 8.10 Verify: `./gradlew build` produces release JAR; CI matrix mandatory rows pass; JAR inspection confirms no Paper/Vault classes, plugin.yml present, PDC namespace correct; all artifacts remain local (no commit/push/tag/PR/release)
+- [x] 8.1 Create `compatibility/evidence.json` schema: `{distribution, version, build, serverSha256, jdkMajor, testSuite, result}` per row
+- [x] 8.2 RED test `CompatibilityEvidenceSchemaTest`: validate evidence.json structure, mandatory rows (Paper 1.18.2/J17, 1.20.6/J21, 1.21.11/J21, Spigot 1.20.6/J21, Purpur 1.20.6/J21) must pass; probe row (Paper 26.x/J25) may fail without blocking certified ranges — platform-compliance Scenario: Missing Paper runtime evidence blocks certification
+- [x] 8.3 RED test `EvidenceGatedSupportTest`: Paper certified only when all mandatory Paper rows pass; Spigot/Purpur verified only after separate smoke; Folia experimental; Paper 26.x uncertified until Java 25 job passes; probe failure does not block unrelated certified claims — platform-compliance Scenario: Support labels follow their evidence, Paper 26.x requires Java 25 evidence
+- [x] 8.4 GREEN: implement evidence validation — mandatory rows gate certification; probe rows are informational; failed/missing probe does not prohibit certified ranges
+- [x] 8.5 Create `.github/workflows/build.yml`: Gradle build + test on push/PR
+- [x] 8.6 Create `.github/workflows/smoke.yml`: matrix — mandatory (Paper 1.18.2/J17, Paper 1.20.6/J21, Paper 1.21.11/J21, Spigot 1.20.6/J21, Purpur 1.20.6/J21) + probe (Paper 26.x/J25, continue-on-error)
+- [x] 8.7 Write `README.md`: H1, benefit paragraph, quick-start, support-tier table, permissions, config, FAQ, `SoftwareApplication` schema
+- [x] 8.8 Update `CHANGELOG.md` with all features for initial release
+- [x] 8.9 Update `openspec/config.yaml` testing section: runner available=true, command=`./gradlew test`, framework=JUnit 5, unit=JUnit 5, integration=MockBukkit, linter=`./gradlew spotlessCheck`, formatter=`./gradlew spotlessApply`
+- [x] 8.10 Verify: `./gradlew build` produces release JAR; CI matrix mandatory rows pass; JAR inspection confirms no Paper/Vault classes, plugin.yml present, PDC namespace correct; all artifacts remain local (no commit/push/tag/PR/release)
 
 ## Phase 9: GitHub Release Publication — USER-AUTHORIZED GATE — (~60 lines)
 

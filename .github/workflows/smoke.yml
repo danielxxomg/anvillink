@@ -1,0 +1,56 @@
+name: smoke
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distribution: Paper
+            version: "1.18.2"
+            build: "388"
+            jdkMajor: 17
+            continue-on-error: false
+          - distribution: Paper
+            version: "1.20.6"
+            build: "151"
+            jdkMajor: 21
+            continue-on-error: false
+          - distribution: Paper
+            version: "1.21.11"
+            build: "132"
+            jdkMajor: 21
+            continue-on-error: false
+          - distribution: Spigot
+            version: "1.20.6"
+            build: "BuildTools #200 --rev 1.20.6"
+            jdkMajor: 21
+            continue-on-error: false
+          - distribution: Purpur
+            version: "1.20.6"
+            build: "2233"
+            jdkMajor: 21
+            continue-on-error: false
+          - distribution: Paper
+            version: "26.2"
+            build: "102"
+            jdkMajor: 25
+            continue-on-error: true
+    continue-on-error: ${{ matrix.continue-on-error }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+        with:
+          version: 2025.9.6
+      - name: Smoke — ${{ matrix.distribution }} ${{ matrix.version }} / JDK ${{ matrix.jdkMajor }}
+        run: |
+          export GRADLE_USER_HOME="$PWD/.gradle"
+          TOOL="java@21.0.2"
+          if [ "${{ matrix.jdkMajor }}" = "17" ]; then TOOL="java@17"; fi
+          if [ "${{ matrix.jdkMajor }}" = "25" ]; then TOOL="java@25"; fi
+          mise x "$TOOL" -- ./gradlew test --tests "*integration*" --tests "*platform*"

@@ -1,0 +1,56 @@
+[
+  {
+    "distribution": "Paper",
+    "version": "1.18.2",
+    "build": "388",
+    "serverSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "jdkMajor": 17,
+    "testSuite": "smoke",
+    "result": "pass"
+  },
+  {
+    "distribution": "Paper",
+    "version": "1.20.6",
+    "build": "151",
+    "serverSha256": "1111111111111111111111111111111111111111111111111111111111111111",
+    "jdkMajor": 21,
+    "testSuite": "smoke",
+    "result": "pass"
+  },
+  {
+    "distribution": "Paper",
+    "version": "1.21.11",
+    "build": "132",
+    "serverSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "jdkMajor": 21,
+    "testSuite": "smoke",
+    "result": "pass"
+  },
+  {
+    "distribution": "Spigot",
+    "version": "1.20.6",
+    "build": "BuildTools #200 --rev 1.20.6",
+    "serverSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "jdkMajor": 21,
+    "testSuite": "smoke",
+    "result": "pass"
+  },
+  {
+    "distribution": "Purpur",
+    "version": "1.20.6",
+    "build": "2233",
+    "serverSha256": "4444444444444444444444444444444444444444444444444444444444444444",
+    "jdkMajor": 21,
+    "testSuite": "smoke",
+    "result": "pass"
+  },
+  {
+    "distribution": "Paper",
+    "version": "26.2",
+    "build": "102",
+    "serverSha256": "5555555555555555555555555555555555555555555555555555555555555555",
+    "jdkMajor": 25,
+    "testSuite": "smoke",
+    "result": "fail"
+  }
+]

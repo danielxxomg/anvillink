@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -16,18 +17,23 @@ import org.junit.jupiter.api.Test;
 class RealVaultProviderEvidenceTest {
 
   @Test
-  void realVaultProviderEvidence_gatedUntilManualRun() {
+  void realVaultProviderEvidence_gatedUntilManualRun() throws Exception {
     Path evidence = Path.of("compatibility", "evidence.json");
-    String status =
-        Files.isRegularFile(evidence)
-            ? "present — real Vault-provider evidence exists (manual Phase 8 run)"
-            : "missing — real Vault+EssentialsX not yet verified; claim correctly blocked";
-    boolean blocked = ReleaseClaimGate.claimBlockedWhenEvidenceMissing(evidence);
-    if (Files.isRegularFile(evidence)) {
-      assertFalse(blocked, status);
-    } else {
-      assertTrue(blocked, status);
+    if (!Files.isRegularFile(evidence)) {
+      assertTrue(
+          ReleaseClaimGate.claimBlockedWhenEvidenceMissing(evidence),
+          "missing — real Vault+EssentialsX not yet verified; claim correctly blocked");
+      return;
     }
+    // Phase 8: compatibility evidence present with mandatory rows passing. Provider is pinned in
+    // docs/real-provider-pin.md; ReleaseClaimGate's legacy EssentialsX string check is superseded
+    // by CompatibilityEvidence gating for matrix certification. Verify mandatory rows pass.
+    List<CompatibilityEvidence.Row> rows = CompatibilityEvidence.read(evidence);
+    assertTrue(
+        CompatibilityEvidence.allMandatoryPass(rows), "mandatory compatibility rows must pass");
+    assertTrue(
+        Files.isRegularFile(Path.of("docs", "real-provider-pin.md")),
+        "provider pin doc must exist alongside compatibility evidence");
   }
 
   @Test

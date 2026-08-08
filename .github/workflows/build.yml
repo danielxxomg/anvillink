@@ -1,0 +1,18 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+        with:
+          version: 2025.9.6
+      - name: Gradle build
+        run: |
+          export GRADLE_USER_HOME="$PWD/.gradle"
+          mise x java@21.0.2 -- ./gradlew cleanTest test spotlessCheck build
