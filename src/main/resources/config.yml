@@ -1,4 +1,4 @@
-# AnvilLink default configuration (v0.3.0 BREAKING: floor >=0 + optional worlds: overrides).
+# AnvilLink default configuration (v0.2.0 BREAKING: floor >=0 + optional worlds: overrides — pending v0.3.0).
 # Reload with /anvillink reload (admin) — see messages below for operator output.
 #
 # price — mandatory per-mode block, each >= 0 (finite, non-negative). Both

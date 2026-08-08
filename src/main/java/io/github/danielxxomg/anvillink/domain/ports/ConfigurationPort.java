@@ -35,7 +35,10 @@ public interface ConfigurationPort {
       String feedbackSound,
       String feedbackParticles) {
     public ConfigSnapshot {
-      worldPrices = worldPrices == null ? Map.of() : Collections.unmodifiableMap(worldPrices);
+      worldPrices =
+          worldPrices == null
+              ? Map.of()
+              : Collections.unmodifiableMap(new java.util.LinkedHashMap<>(worldPrices));
     }
   }
 

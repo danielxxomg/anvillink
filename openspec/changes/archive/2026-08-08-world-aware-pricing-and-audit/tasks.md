@@ -120,14 +120,14 @@ Chain strategy: feature-branch-chain
 
 ### Slice 1 — Pricing
 
-- [ ] `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew clean test --tests "*MoneyAmountTest*ValidatedPriceTest*FileConfigurationPortTest*RepairActivationTest*WorldAwarePricingE2ETest"` all green
-- [ ] `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew spotlessCheck build` — `BytecodeFloorTest` major 61, no Bukkit in `domain/**`
-- [ ] Rollback: revert pricing files only, `audit.log` untouched, `worlds:` → unknown warn ignore
-- [ ] Coverage: `jacocoTestReport` pricing paths (global + per-world + fallback + scale)
+- [x] `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew clean test --tests "*MoneyAmountTest*ValidatedPriceTest*FileConfigurationPortTest*RepairActivationTest*WorldAwarePricingE2ETest"` all green
+- [x] `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew spotlessCheck build` — `BytecodeFloorTest` major 61, no Bukkit in `domain/**`
+- [x] Rollback: revert pricing files only, `audit.log` untouched, `worlds:` → unknown warn ignore
+- [x] Coverage: `jacocoTestReport` pricing paths (global + per-world + fallback + scale)
 
 ### Slice 2 — Audit
 
-- [ ] `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew clean test --tests "*FileAuditAdapterTest*Audit*E2ETest"` green, `audit.log` temp file has `CREATE|APPEND|mkdirs` + `toPlainString`
-- [ ] `spotlessCheck` + `build` green, fixed `plugins/AnvilLink/audit.log` only, no new deps, `shadowJar` exclusions hold
-- [ ] Rollback: remove `AuditPort`/`FileAuditAdapter` + wiring, delete/archive `audit.log`, pricing still works
-- [ ] Manual rotation: rename `audit.log` → next paid `Success` recreates, unbounded + GDPR note in config header
+- [x] `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew clean test --tests "*FileAuditAdapterTest*Audit*E2ETest"` green, `audit.log` temp file has `CREATE|APPEND|mkdirs` + `toPlainString`
+- [x] `spotlessCheck` + `build` green, fixed `plugins/AnvilLink/audit.log` only, no new deps, `shadowJar` exclusions hold
+- [x] Rollback: remove `AuditPort`/`FileAuditAdapter` + wiring, delete/archive `audit.log`, pricing still works
+- [x] Manual rotation: rename `audit.log` → next paid `Success` recreates, unbounded + GDPR note in config header
