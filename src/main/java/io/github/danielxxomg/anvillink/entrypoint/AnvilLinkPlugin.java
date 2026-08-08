@@ -4,6 +4,7 @@ package io.github.danielxxomg.anvillink.entrypoint;
 
 import io.github.danielxxomg.anvillink.adapter.AdminCommandHandler;
 import io.github.danielxxomg.anvillink.adapter.BukkitEquipmentPort;
+import io.github.danielxxomg.anvillink.adapter.BukkitFeedbackAdapter;
 import io.github.danielxxomg.anvillink.adapter.BukkitSchedulerAdapter;
 import io.github.danielxxomg.anvillink.adapter.FileConfigurationPort;
 import io.github.danielxxomg.anvillink.adapter.InteractionFilter;
@@ -14,6 +15,7 @@ import io.github.danielxxomg.anvillink.adapter.VaultEconomyGateway;
 import io.github.danielxxomg.anvillink.domain.RepairActivation;
 import io.github.danielxxomg.anvillink.domain.ports.EconomyPort;
 import io.github.danielxxomg.anvillink.domain.ports.EquipmentPort;
+import io.github.danielxxomg.anvillink.domain.ports.FeedbackPort;
 import io.github.danielxxomg.anvillink.domain.ports.MessagePort;
 import io.github.danielxxomg.anvillink.domain.ports.OperationalReporter;
 import io.github.danielxxomg.anvillink.domain.ports.SchedulerPort;
@@ -44,6 +46,7 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
   private EquipmentPort equipment;
   private SignPort signs;
   private RepairActivation activation;
+  private FeedbackPort feedback;
 
   @Override
   public void onEnable() {
@@ -64,6 +67,7 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
     }
     economy = new VaultEconomyGateway();
     equipment = new BukkitEquipmentPort(uuid -> Bukkit.getPlayer(uuid));
+    feedback = new BukkitFeedbackAdapter(configPort, messagePort, scheduler, Bukkit::getPlayer);
     signs = bukkitSignPort();
     OperationalReporter reporter =
         (severity, code, ctx) ->
@@ -136,6 +140,12 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
         instanceof io.github.danielxxomg.anvillink.domain.TransactionResult.Success s) {
       if (s.amount().compareTo(BigDecimal.ZERO) == 0) {
         player.sendMessage(messagePort.render("no-eligible-items", java.util.Map.of()));
+      } else {
+        try {
+          feedback.play(new SignPort.PlayerId(player.getUniqueId()), s.amount(), s.repairedCount());
+        } catch (Exception ignored) {
+          // feedback never affects transaction
+        }
       }
     }
   }

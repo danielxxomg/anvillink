@@ -5,6 +5,22 @@ All notable changes to AnvilLink will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — BREAKING per-mode pricing + success feedback (MAJOR)
+
+### BREAKING
+
+- `config.yml` `price: 25.00` scalar removed — replaced by mandatory `price.hand` (`>= 10_000`) + `price.all` (`>= 10_000`) nested block under `price:` header. Bare scalar, missing `price.hand`, missing `price.all`, or below-floor values fail-closed (`activationEnabled=false` at startup, `ReloadOutcome.Failure` retaining prior on reload). Migration: edit existing `config.yml` to `price.hand: 12000.00` / `price.all: 25000.00`.
+- `ConfigurationPort.ConfigSnapshot` now `priceHand`/`priceAll` + `feedbackEnabled`/`feedbackSound`/`feedbackParticles` (global defaults: enabled=true, sound=BLOCK_ANVIL_USE, particles=CRIT).
+- `TransactionResult.Success` now `Success(BigDecimal amount, int repairedCount)` — `repairedCount` for `{count}`, `amount.toPlainString()` for `{price}`.
+
+### Added
+
+- Per-mode floor `MoneyAmount.MIN_PRICE=10_000` mirrored in `ValidatedPrice`; parser and domain both enforce.
+- `RepairActivation` mode selector: `priceHand`/`priceAll` switched on PDC `RepairMode` before `ValidatedPrice.of(selected, fractionalDigits)`; per-mode precision fail-closed, empty plan `Success(ZERO,0)` no withdrawal, `repairedCount=planned.size()`.
+- `FeedbackPort` pure port `play(SignPort.PlayerId, BigDecimal, int)` + `BukkitFeedbackAdapter` (server-thread via `SchedulerPort`, swallowed, never touches economy) wired in `AnvilLinkPlugin` gated on `amount != ZERO`.
+- `messages.repair-success: "<green>Repaired {count} items for {price}.</green>"` and `feedback:` block in `config.yml`; disabled feedback is silent, throw is swallowed.
+- `PricePerModeE2ETest` + `FeedbackE2ETest` (MockBukkit 4.110) covering per-mode withdrawals, scalar rejection, reload retention, paid HAND/ALL count/price, zero/disabled/throw-silence.
+
 ## [Unreleased] — AnvilLink initial release
 
 ### Added

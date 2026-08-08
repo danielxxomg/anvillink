@@ -38,11 +38,20 @@ Signing identity is the PDC key `danielxxomg:anvillink_repair_sign` (versioned b
 
 ## Configuration (`plugins/AnvilLink/config.yml`)
 
+> BREAKING (MAJOR): `price` is now per-mode `price.hand` + `price.all` (each `>= 10_000`, flat scalar `price: 25.00` is INVALID). Migration: replace `price: 25.00` with `price.hand: 12000.00` / `price.all: 25000.00`. Invalid startup → `activationEnabled=false` until fixed; invalid reload retains prior valid config atomically.
+
 ```yaml
-price: 25.00
+price:
+  hand: 12000.00 # mandatory >= 10_000, per HAND (1 slot)
+  all:  25000.00 # mandatory >= 10_000, per ALL (6 slots)
+feedback:
+  enabled: true
+  sound: BLOCK_ANVIL_USE
+  particles: CRIT
 admin:
   target-distance: 8   # 1–32, line-of-sight for /anvillink inspect|rerender
 messages:
+  repair-success: "<green>Repaired {count} items for {price}.</green>" # {count}=repaired slots, {price}=amount.toPlainString()
   no-target: "<red>No sign in sight."
   not-registered: "<red>Not a registered repair sign."
   invalid-identity: "<red>Invalid sign identity."
@@ -50,7 +59,7 @@ messages:
   # ... MiniMessage templates (reload with /anvillink reload)
 ```
 
-Reload: `/anvillink reload` (manage). Valid reload swaps atomically; invalid reload keeps the prior config and reports failure. Invalid startup disables activation until fixed.
+Reload: `/anvillink reload` (manage). Valid reload swaps atomically; invalid reload keeps the prior config and reports failure. Invalid startup disables activation until fixed. `feedback.enabled=false` silences sound/particles/message for paid `repair-success` (still gated on `amount != ZERO`); feedback failures are swallowed and never trigger compensation.
 
 ## FAQ
 

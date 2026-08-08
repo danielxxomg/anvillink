@@ -199,6 +199,131 @@ class FileConfigurationPortTest {
     assertEquals("CRIT", port.current().feedbackParticles());
   }
 
+  @Test
+  void feedbackDisabled_snapshotReflectsDisabled(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    write(
+        file,
+        "price:\n  hand: 12000.00\n  all: 25000.00\n"
+            + "feedback:\n"
+            + "  enabled: false\n"
+            + "  sound: BLOCK_ANVIL_USE\n"
+            + "  particles: CRIT\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    assertFalse(port.current().feedbackEnabled());
+    assertEquals("BLOCK_ANVIL_USE", port.current().feedbackSound());
+  }
+
+  @Test
+  void feedbackMissingBlock_defaultsToEnabled(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    write(
+        file,
+        "price:\n  hand: 12000.00\n  all: 25000.00\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    assertTrue(port.current().feedbackEnabled());
+    assertEquals("BLOCK_ANVIL_USE", port.current().feedbackSound());
+    assertEquals("CRIT", port.current().feedbackParticles());
+    // reload with explicit enabled true then missing block retains default enabled
+    write(
+        file,
+        "price:\n  hand: 12000.00\n  all: 25000.00\n"
+            + "feedback:\n"
+            + "  enabled: true\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    FileConfigurationPort port2 = new FileConfigurationPort(file.toFile());
+    assertTrue(port2.current().feedbackEnabled());
+  }
+
+  @Test
+  void repairSuccessAbsent_stillSucceeds(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    write(
+        file,
+        "price:\n  hand: 12000.00\n  all: 25000.00\n"
+            + "feedback:\n"
+            + "  enabled: true\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    assertTrue(port.current().activationEnabled());
+    // messages map may not contain repair-success but still succeeds; MessagePort will fallback
+    assertFalse(port.current().messages().containsKey("repair-success"));
+  }
+
+  @Test
+  void invalidReload_retainsFeedbackAndPricesAtomically(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    write(
+        file,
+        "price:\n  hand: 12000.00\n  all: 25000.00\n"
+            + "feedback:\n"
+            + "  enabled: true\n"
+            + "  sound: BLOCK_ANVIL_USE\n"
+            + "  particles: CRIT\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  repair-success: \"<green>ok</green>\"\n");
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    assertTrue(port.current().feedbackEnabled());
+    assertEquals("BLOCK_ANVIL_USE", port.current().feedbackSound());
+
+    // invalid scalar reload must retain prior prices + feedback
+    write(
+        file,
+        "price: 25.00\n"
+            + "feedback:\n"
+            + "  enabled: false\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    ConfigurationPort.ReloadOutcome outcome = port.reload();
+    assertInstanceOf(ConfigurationPort.ReloadOutcome.Failure.class, outcome);
+    assertEquals(new BigDecimal("12000.00"), port.current().priceHand());
+    assertEquals(new BigDecimal("25000.00"), port.current().priceAll());
+    assertTrue(port.current().feedbackEnabled(), "failed reload must retain prior feedbackEnabled");
+    assertEquals("BLOCK_ANVIL_USE", port.current().feedbackSound());
+    assertEquals("CRIT", port.current().feedbackParticles());
+
+    // invalid missing hand
+    write(file, "price:\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    ConfigurationPort.ReloadOutcome outcome2 = port.reload();
+    assertInstanceOf(ConfigurationPort.ReloadOutcome.Failure.class, outcome2);
+    assertEquals(new BigDecimal("12000.00"), port.current().priceHand());
+
+    // below floor
+    write(
+        file,
+        "price:\n  hand: 5000\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    ConfigurationPort.ReloadOutcome outcome3 = port.reload();
+    assertInstanceOf(ConfigurationPort.ReloadOutcome.Failure.class, outcome3);
+    assertEquals(new BigDecimal("12000.00"), port.current().priceHand());
+    assertTrue(port.current().feedbackEnabled());
+  }
+
+  @Test
+  void validReload_atomicallySwapsFeedback(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    write(
+        file,
+        "price:\n  hand: 12000.00\n  all: 25000.00\n"
+            + "feedback:\n"
+            + "  enabled: true\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    write(
+        file,
+        "price:\n  hand: 15000.00\n  all: 30000.00\n"
+            + "feedback:\n"
+            + "  enabled: false\n"
+            + "  sound: ENTITY_EXPERIENCE_ORB_PICKUP\n"
+            + "  particles: FLAME\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    ConfigurationPort.ReloadOutcome outcome = port.reload();
+    assertInstanceOf(ConfigurationPort.ReloadOutcome.Success.class, outcome);
+    assertEquals(new BigDecimal("15000.00"), port.current().priceHand());
+    assertFalse(port.current().feedbackEnabled());
+    assertEquals("ENTITY_EXPERIENCE_ORB_PICKUP", port.current().feedbackSound());
+    assertEquals("FLAME", port.current().feedbackParticles());
+  }
+
   private static void write(Path file, String content) throws Exception {
     Files.writeString(file, content, StandardCharsets.UTF_8);
   }
