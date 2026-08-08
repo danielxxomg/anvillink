@@ -231,3 +231,36 @@ for slice 1, or chain to PR 2 planning once PR 1 is reviewed.
 **Rollback boundary**: delete `domain/TransactionResult.java`, `domain/ValidatedPrice.java`, `domain/ports/*.java` (7 files), `domain/TransactionResultTest.java`, `domain/ValidatedPriceTest.java`; revert tasks 2.5–2.10 `[x]`→`[ ]`; truncate this section. No Phase 3+ files affected.
 
 **Full Phase 2 status**: 2.1–2.10 COMPLETE (10/10). Next: Phase 3 (RepairActivation + Compensation use case).
+
+---
+
+## Slice 3 — RepairActivation + Compensation (3.1–3.11) — 2026-08-07
+
+**Work unit**: `slice-3-activation` (attempt `sha256:e0772b230480f556596780ac3a7ddaf78230d4b008daf2f7e4e2b8f56f3ca17d`, auto-chain / feature-branch-chain)
+**Boundary**: 3.1–3.11 only (RepairActivation use case + 9 RED paths + verify). No Phase 4+ adapters.
+**Budget**: 138 prod + 260 test = 398 (≤400). Tight after import compaction (wildcard ports + util star saved 7 lines).
+
+- [x] 3.1 RED `emptyPlan_isFree_noVault` → GREEN
+- [x] 3.2 RED `noProvider_failClosed` → GREEN
+- [x] 3.3 RED `insufficientFunds_noSecondWithdraw_noRepair` → GREEN
+- [x] 3.4 RED `textAlone_hasNoAuthority` → GREEN
+- [x] 3.5 RED `flatCharge_oneWithdrawal_25` → GREEN (ALL 6 slots, price 25.00, one withdraw)
+- [x] 3.6 RED `paymentFailure_preservesEquipment` → GREEN (InsufficientFunds ⇒ no apply, no deposit)
+- [x] 3.7 RED `compensationSuccess_noNetCharge` → GREEN (PartialFailure + restore ok + deposit ok → CompensationSuccess)
+- [x] 3.8 RED `compensationDepositFails_highSev` → GREEN (restore ok, deposit fail → CompensationFailed + HIGH)
+- [x] 3.9 RED `restoreFails_terminal_highSev` → GREEN (restore fail → deposit attempted + HIGH restoration-failed)
+- [x] 3.10 GREEN `RepairActivation` (138 lines) — PDC/tamper/permission, ValidatedPrice, plan, single withdraw, scheduler apply, snapshot restore + compensating deposit
+- [x] 3.11 Verify: `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew cleanTest test spotlessCheck build` → BUILD SUCCESSFUL; 58 tests PASS (49 prior + 9 new)
+
+**Slice 3 files (398 total, 2 files)**:
+
+| File | Lines | What |
+|------|-------|------|
+| `domain/RepairActivation.java` | 138 | pure-domain use case, 7 ports, compensating deposit |
+| `domain/RepairActivationTest.java` | 260 | 9 RED→GREEN (3.1–3.9) in one file, all compensation/restoration paths |
+
+**Host-API purity**: `grep -R "org.bukkit\|net.milkbowl\|net.kyori\|io.papermc" src/main/java/.../domain` → 0.
+**Reconciliation**: Forecast ~335; actual 398 (+63) = 6 extra assertions + richer stubs for compensation coverage. Within 400; no exception.
+**Rollback boundary**: delete 2 new files; revert tasks 3.1–3.11 `[x]`→`[ ]`; truncate this section.
+
+**Full Phase 3 status**: 3.1–3.11 COMPLETE (11/11). Next: Phase 4 (PDC identity + lifecycle adapters).

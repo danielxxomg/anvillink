@@ -76,17 +76,17 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 
 ## Phase 3: Ports, Activation + Compensation Use Case (TDD) — PR 3 (~335 lines)
 
-- [ ] 3.1 RED test `RepairActivationTest` (no eligible): validate sign, plan empty, no Vault call, no charge — repair-economy Scenario: Undamaged or ineligible equipment is free
-- [ ] 3.2 RED test `RepairActivationTest` (no provider): valid plan, missing Vault → fail closed — repair-economy Scenario: Provider is unavailable
-- [ ] 3.3 RED test `RepairActivationTest` (insufficient funds): single withdrawal fails, no second attempt, no repair — repair-economy Scenario: Insufficient funds do not repair
-- [ ] 3.4 RED test `RepairActivationTest` (text alone): visible text matches but PDC incomplete → no charge — repair-signs Scenario: Visible text alone has no authority
-- [ ] 3.5 RED test `RepairActivationTest` (flat charge): non-empty ALL plan, price 25.00, success → exactly one withdrawal of 25.00 — repair-economy Scenario: One successful activation has one flat charge
-- [ ] 3.6 RED test `RepairActivationTest` (payment failure preserves): failed payment → no item mutated — equipment-repair Scenario: Payment failure preserves equipment
-- [ ] 3.7 RED test `CompensationTest` (success restore): withdrawal + partial mutation + restore success + deposit success → no net charge — repair-economy Scenario: Successful compensation restores payment state
-- [ ] 3.8 RED test `CompensationTest` (deposit fails): mutation + restore + deposit fail → high-sev event, player notified — repair-economy Scenario: Failed compensation is observable
-- [ ] 3.9 RED test `CompensationTest` (restore fails): mutation + restore fails → deposit attempted, high-sev evidence, no retry — repair-economy Scenario: Restoration failure is terminal and observable
-- [ ] 3.10 GREEN: implement `RepairActivation` use case — validate sign/PDC, check permissions, plan equipment, validate price, call economy port, apply repair on scheduler via `EquipmentPort` snapshot restoration, handle all failure/compensation paths with compensating deposit via `EconomyPort`
-- [ ] 3.11 Verify: `./gradlew test` — all activation/compensation RED tests now green
+- [x] 3.1 RED test `RepairActivationTest` (no eligible): validate sign, plan empty, no Vault call, no charge — repair-economy Scenario: Undamaged or ineligible equipment is free
+- [x] 3.2 RED test `RepairActivationTest` (no provider): valid plan, missing Vault → fail closed — repair-economy Scenario: Provider is unavailable
+- [x] 3.3 RED test `RepairActivationTest` (insufficient funds): single withdrawal fails, no second attempt, no repair — repair-economy Scenario: Insufficient funds do not repair
+- [x] 3.4 RED test `RepairActivationTest` (text alone): visible text matches but PDC incomplete → no charge — repair-signs Scenario: Visible text alone has no authority
+- [x] 3.5 RED test `RepairActivationTest` (flat charge): non-empty ALL plan, price 25.00, success → exactly one withdrawal of 25.00 — repair-economy Scenario: One successful activation has one flat charge
+- [x] 3.6 RED test `RepairActivationTest` (payment failure preserves): failed payment → no item mutated — equipment-repair Scenario: Payment failure preserves equipment
+- [x] 3.7 RED test `CompensationTest` (success restore): withdrawal + partial mutation + restore success + deposit success → no net charge — repair-economy Scenario: Successful compensation restores payment state
+- [x] 3.8 RED test `CompensationTest` (deposit fails): mutation + restore + deposit fail → high-sev event, player notified — repair-economy Scenario: Failed compensation is observable
+- [x] 3.9 RED test `CompensationTest` (restore fails): mutation + restore fails → deposit attempted, high-sev evidence, no retry — repair-economy Scenario: Restoration failure is terminal and observable
+- [x] 3.10 GREEN: implement `RepairActivation` use case — validate sign/PDC, check permissions, plan equipment, validate price, call economy port, apply repair on scheduler via `EquipmentPort` snapshot restoration, handle all failure/compensation paths with compensating deposit via `EconomyPort`
+- [x] 3.11 Verify: `./gradlew test` — all activation/compensation RED tests now green
 
 ## Phase 4: PDC Identity, Sign Lifecycle Adapter — PR 4 (~360 lines)
 
