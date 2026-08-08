@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
@@ -576,6 +577,7 @@ class SignIntegrationTest {
               new ConfigurationPort.ConfigSnapshot(
                   new BigDecimal("12000.00"),
                   new BigDecimal("25000.00"),
+                  Map.of(),
                   8,
                   java.util.Map.of(
                       "tampered", "tampered", "reload-success", "ok", "rerender-success", "ok"),
@@ -639,7 +641,7 @@ class SignIntegrationTest {
     assertEquals(12, port.current().targetDistance());
     Files.writeString(
         cfg.toPath(),
-        "price:\n  hand: 9999.99\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n",
+        "price:\n  hand: -1\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n",
         StandardCharsets.UTF_8);
     var fail = port.reload();
     assertInstanceOf(ConfigurationPort.ReloadOutcome.Failure.class, fail);

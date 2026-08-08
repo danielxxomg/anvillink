@@ -21,6 +21,7 @@ class BukkitFeedbackAdapterTest {
           new ConfigSnapshot(
               new BigDecimal("12000.00"),
               new BigDecimal("25000.00"),
+              Map.of(),
               8,
               Map.of("repair-success", "<green>{count} {price}</green>"),
               true,

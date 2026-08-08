@@ -274,6 +274,7 @@ class AdminCommandTest {
         new ConfigurationPort.ConfigSnapshot(
             new BigDecimal("12000.00"),
             new BigDecimal("25000.00"),
+            Map.of(),
             distance,
             Map.of(),
             true,

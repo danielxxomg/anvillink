@@ -71,6 +71,7 @@ class ErrorMessagesUnchangedTest {
         new ConfigurationPort.ConfigSnapshot(
             new java.math.BigDecimal("12000.00"),
             new java.math.BigDecimal("25000.00"),
+            Map.of(),
             8,
             Map.of(
                 "insufficient-funds", "<red>You do not have enough funds.</red>",

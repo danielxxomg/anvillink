@@ -1,16 +1,28 @@
-# AnvilLink default configuration (v0.2.0 BREAKING: per-mode pricing + feedback).
+# AnvilLink default configuration (v0.3.0 BREAKING: floor >=0 + optional worlds: overrides).
 # Reload with /anvillink reload (admin) — see messages below for operator output.
 #
-# price — mandatory per-mode block, each >= 10000 (MoneyAmount.MIN_PRICE). Both
+# price — mandatory per-mode block, each >= 0 (finite, non-negative). Both
 # price.hand (HAND, 1 slot) and price.all (ALL, 6 slots) must be present.
 # Bare scalar `price: 25.00` is INVALID and fail-closes (activationEnabled=false
 # at startup; reload retains prior valid config). Values are BigDecimal-exact in
 # this file; VaultEconomyGateway converts via double so representability against
-# the provider's fractionalDigits is validated — display the gateway amount via
-# amount.toPlainString(), not the literal `12000.00` string.
+# the provider's fractionalDigits is validated at activation via ValidatedPrice —
+# display the gateway amount via amount.toPlainString(), not the literal `12000.00` string.
 price:
-  hand: 12000.00 # mandatory >= 10000 (HAND)
-  all: 25000.00 # mandatory >= 10000 (ALL)
+  hand: 12000.00 # mandatory >= 0 (HAND)
+  all: 25000.00 # mandatory >= 0 (ALL)
+
+# worlds — optional per-world price overrides. Each worlds.<world> MAY contain only
+# hand or only all; missing key falls back to global. Present values must be finite
+# >= 0. Lookup is exact case-sensitive via player.getWorld().getName(); unknown world
+# -> global. Null/empty worldName -> global. Unknown subkeys are warned/ignored.
+# Present unparseable/negative/non-finite fails whole file closed (retain prior).
+# Example (commented — defaults global only):
+#worlds:
+#  world:
+#    hand: 5000
+#  world_nether:
+#    all: 1000
 
 # feedback — global success feedback for committed Success(non-zero). Defaults
 # below are the effective defaults when the block is absent; consumed on server

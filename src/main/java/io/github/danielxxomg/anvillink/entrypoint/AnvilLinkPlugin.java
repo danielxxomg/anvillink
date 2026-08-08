@@ -121,8 +121,9 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
     }
     var rec = signs.load(id);
     if (rec.isEmpty()) return;
-    // use RepairActivation via sign id + player uuid
-    var result = activation.activate(id, player.getUniqueId());
+    // capture worldName on server thread before activation (domain pure String seam)
+    String worldName = player.getWorld().getName();
+    var result = activation.activate(id, player.getUniqueId(), worldName);
     if (result
         instanceof io.github.danielxxomg.anvillink.domain.TransactionResult.InsufficientFunds) {
       player.sendMessage(messagePort.render("insufficient-funds", java.util.Map.of()));

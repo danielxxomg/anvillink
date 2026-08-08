@@ -12,24 +12,28 @@ import org.junit.jupiter.api.Test;
 class ValidatedPriceTest {
 
   @Test
+  void acceptsZeroAndLowPriceWithFractionalDigits2() {
+    // Slice 1: >=0 replaces MIN_PRICE — 0 and small values pass
+    assertEquals(new BigDecimal("0"), ValidatedPrice.of("0", 2).value());
+    assertEquals(new BigDecimal("100"), ValidatedPrice.of("100", 2).value());
+    assertEquals(new BigDecimal("0"), ValidatedPrice.of(new BigDecimal("0"), 2).value());
+    assertEquals(new BigDecimal("100"), ValidatedPrice.of(new BigDecimal("100"), 2).value());
+  }
+
+  @Test
   void acceptsFiniteNonNegativeWithCompatibleScale() {
     ValidatedPrice price = ValidatedPrice.of("12000.00", 2);
     assertEquals(new BigDecimal("12000.00"), price.amount().value());
     assertEquals(new BigDecimal("12000.00"), price.value());
-  }
-
-  @Test
-  void acceptsFloorAndIntegerWithGenerousDigits() {
-    assertEquals(new BigDecimal("10000"), ValidatedPrice.of("10000", 2).value());
-    assertEquals(new BigDecimal("15000"), ValidatedPrice.of("15000", 2).value());
     // fractionalDigits=-1 means unlimited (Vault contract).
-    assertEquals(new BigDecimal("10000.12345"), ValidatedPrice.of("10000.12345", -1).value());
+    assertEquals(new BigDecimal("12000.12345"), ValidatedPrice.of("12000.12345", -1).value());
   }
 
   @Test
   void rejectsNegative() {
     assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("-1", 2));
     assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("-0.01", 2));
+    assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of(new BigDecimal("-1"), 2));
   }
 
   @Test
@@ -40,28 +44,19 @@ class ValidatedPriceTest {
   }
 
   @Test
-  void rejectsBelowFloor() {
-    assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("9999.99", 2));
-    assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("5000", 2));
-    assertThrows(
-        IllegalArgumentException.class, () -> ValidatedPrice.of(new BigDecimal("9999"), 2));
-  }
-
-  @Test
-  void rejectsPrecisionOverflowAgainstFractionalDigits() {
-    // 12000.001 needs 3 fractional digits but provider reports 2.
+  void rejectsPrecisionOverflow100_001WithFd2() {
+    assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("100.001", 2));
     assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("12000.001", 2));
-    assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("10000.001", 0));
     assertThrows(
-        IllegalArgumentException.class, () -> ValidatedPrice.of(new BigDecimal("10000.001"), 2));
+        IllegalArgumentException.class, () -> ValidatedPrice.of(new BigDecimal("100.001"), 2));
   }
 
   @Test
   void scaleCheckUsesBigDecimalScaleAgainstFractionalDigits() {
     // Exactly at limit should pass; one beyond should fail.
-    ValidatedPrice atLimit = ValidatedPrice.of("10000.00", 2);
+    ValidatedPrice atLimit = ValidatedPrice.of("100.00", 2);
     assertTrue(atLimit.amount().representableAt(2));
-    assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("10000.000", 2));
+    assertThrows(IllegalArgumentException.class, () -> ValidatedPrice.of("100.000", 2));
   }
 
   @Test

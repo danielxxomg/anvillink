@@ -60,7 +60,7 @@ class FileConfigurationPortTest {
 
     write(
         file,
-        "price:\n  hand: 9999.99\n  all: 25000.00\n"
+        "price:\n  hand: -1\n  all: 25000.00\n"
             + "admin:\n"
             + "  target-distance: 8\n"
             + "messages:\n"
@@ -80,7 +80,7 @@ class FileConfigurationPortTest {
     Path file = temp.resolve("config.yml");
     write(
         file,
-        "price:\n  hand: 9999.99\n  all: 25000.00\n"
+        "price:\n  hand: -1\n  all: 25000.00\n"
             + "admin:\n"
             + "  target-distance: 8\n"
             + "messages:\n"
@@ -157,25 +157,27 @@ class FileConfigurationPortTest {
   }
 
   @Test
-  void belowFloorHand_rejected(@TempDir Path temp) throws Exception {
+  void negativeHand_rejected(@TempDir Path temp) throws Exception {
     Path file = temp.resolve("config.yml");
     write(
         file,
-        "price:\n  hand: 9999.99\n  all: 25000.00\n"
+        "price:\n  hand: -1\n  all: 25000.00\n"
             + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
     FileConfigurationPort port = new FileConfigurationPort(file.toFile());
     assertFalse(port.current().activationEnabled());
   }
 
   @Test
-  void belowFloorAll_rejected(@TempDir Path temp) throws Exception {
+  void zeroAndLowAccepted(@TempDir Path temp) throws Exception {
     Path file = temp.resolve("config.yml");
     write(
         file,
-        "price:\n  hand: 12000.00\n  all: 5000\n"
+        "price:\n  hand: 0\n  all: 100\n"
             + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
     FileConfigurationPort port = new FileConfigurationPort(file.toFile());
-    assertFalse(port.current().activationEnabled());
+    assertTrue(port.current().activationEnabled());
+    assertEquals(new BigDecimal("0"), port.current().priceHand());
+    assertEquals(new BigDecimal("100"), port.current().priceAll());
   }
 
   @Test
@@ -288,10 +290,10 @@ class FileConfigurationPortTest {
     assertInstanceOf(ConfigurationPort.ReloadOutcome.Failure.class, outcome2);
     assertEquals(new BigDecimal("12000.00"), port.current().priceHand());
 
-    // below floor
+    // negative hand
     write(
         file,
-        "price:\n  hand: 5000\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+        "price:\n  hand: -1\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
     ConfigurationPort.ReloadOutcome outcome3 = port.reload();
     assertInstanceOf(ConfigurationPort.ReloadOutcome.Failure.class, outcome3);
     assertEquals(new BigDecimal("12000.00"), port.current().priceHand());

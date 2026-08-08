@@ -31,6 +31,10 @@ public final class RepairActivation {
   }
 
   public TransactionResult activate(SignPort.SignId id, UUID player) {
+    return activate(id, player, null);
+  }
+
+  public TransactionResult activate(SignPort.SignId id, UUID player, String worldName) {
     var rec = signs.load(id);
     if (rec.isEmpty()) return new TransactionResult.InvalidResponse("missing-pdc");
     if (!signs.hasPermission(new SignPort.PlayerId(player), "anvillink.use")) {
@@ -46,7 +50,7 @@ public final class RepairActivation {
     var cfg = config.current();
     if (cfg == null || !cfg.activationEnabled())
       return new TransactionResult.InvalidResponse("activation-disabled");
-    BigDecimal selected = rec.get().mode() == RepairMode.HAND ? cfg.priceHand() : cfg.priceAll();
+    BigDecimal selected = resolveEffectivePrice(cfg, rec.get().mode(), worldName);
     ValidatedPrice price;
     try {
       price = ValidatedPrice.of(selected, economy.fractionalDigits());
@@ -74,6 +78,18 @@ public final class RepairActivation {
     scheduler.runOnServerThread(
         () -> apply(handle, planned, id, player, amount, withdrawn, out, planned.size()));
     return out[0] != null ? out[0] : new TransactionResult.Success(withdrawn, planned.size());
+  }
+
+  private BigDecimal resolveEffectivePrice(
+      ConfigurationPort.ConfigSnapshot cfg, RepairMode mode, String worldName) {
+    if (worldName != null && !worldName.isEmpty()) {
+      var wp = cfg.worldPrices().get(worldName);
+      if (wp != null) {
+        BigDecimal perWorld = mode == RepairMode.HAND ? wp.hand() : wp.all();
+        if (perWorld != null) return perWorld;
+      }
+    }
+    return mode == RepairMode.HAND ? cfg.priceHand() : cfg.priceAll();
   }
 
   private void apply(

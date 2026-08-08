@@ -283,9 +283,11 @@ class RepairActivationTest {
   static final class StubCfg implements ConfigurationPort {
     BigDecimal hand = new BigDecimal("12000.00");
     BigDecimal all = new BigDecimal("25000.00");
+    Map<String, WorldPrice> worldPrices = Map.of();
 
     public ConfigSnapshot current() {
-      return new ConfigSnapshot(hand, all, 8, Map.of(), true, true, "BLOCK_ANVIL_USE", "CRIT");
+      return new ConfigSnapshot(
+          hand, all, worldPrices, 8, Map.of(), true, true, "BLOCK_ANVIL_USE", "CRIT");
     }
 
     public ReloadOutcome reload() {

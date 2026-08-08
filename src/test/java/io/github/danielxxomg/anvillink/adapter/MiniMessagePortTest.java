@@ -18,6 +18,7 @@ class MiniMessagePortTest {
         new ConfigurationPort.ConfigSnapshot(
             new java.math.BigDecimal("12000.00"),
             new java.math.BigDecimal("25000.00"),
+            Map.of(),
             8,
             Map.of("greeting", "<green>Hello <white>{name}</white></green>"),
             true,
@@ -70,6 +71,7 @@ class MiniMessagePortTest {
         new ConfigurationPort.ConfigSnapshot(
             new java.math.BigDecimal("12000.00"),
             new java.math.BigDecimal("25000.00"),
+            Map.of(),
             8,
             Map.of(),
             true,
