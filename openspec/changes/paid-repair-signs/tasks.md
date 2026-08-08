@@ -90,16 +90,16 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 
 ## Phase 4: PDC Identity, Sign Lifecycle Adapter — PR 4 (~360 lines)
 
-- [ ] 4.1 RED test `PdcSignIdentityTest`: encode/decode BYTE_ARRAY, roundtrip through TileState mock — platform-compliance Scenario: Stable namespace (display-brand change preserves identity)
-- [ ] 4.2 RED test `PdcSignIdentityTest` (malformed): malformed bytes fail closed, missing creator/marker fails closed — repair-signs Scenario: Missing creation authorization fails closed
-- [ ] 4.3 GREEN: implement `PdcSignIdentity` adapter — read/write `danielxxomg:anvillink_repair_sign` PDC key, versioned BYTE_ARRAY, permanent namespace decoupled from display brand
-- [ ] 4.4 RED test `SignLifecycleListenerTest` (create authorized): permitted player, valid front [repair]+HAND → blue text, PDC written
-- [ ] 4.5 RED test `SignLifecycleListenerTest` (create unauthorized): no create permission → cancelled, no PDC — repair-signs Scenario: Unauthorized creation is rejected
-- [ ] 4.6 RED test `SignLifecycleListenerTest` (break unauthorized): registered sign, no manage → cancelled, PDC unchanged — repair-signs Scenario: Unauthorized edit or break is cancelled
-- [ ] 4.7 RED test `SignLifecycleListenerTest` (edit by manager): manage permission → proceeds, but text remains tampered until rerender
-- [ ] 4.8 GREEN: implement `SignLifecycleListener` — SignChangeEvent (create), BlockBreakEvent (break), PDC check, permission gate
-- [ ] 4.9 RED test `PdcNamespacePermanenceTest`: simulate display-brand rename → PDC namespace/key/schema unchanged, existing signs remain valid — platform-compliance Scenario: Display-brand change preserves identity
-- [ ] 4.10 Verify: `./gradlew test` — PDC and lifecycle tests green
+- [x] 4.1 RED test `PdcSignIdentityTest`: encode/decode BYTE_ARRAY, roundtrip through TileState mock — platform-compliance Scenario: Stable namespace (display-brand change preserves identity)
+- [x] 4.2 RED test `PdcSignIdentityTest` (malformed): malformed bytes fail closed, missing creator/marker fails closed — repair-signs Scenario: Missing creation authorization fails closed
+- [x] 4.3 GREEN: implement `PdcSignIdentity` adapter — read/write `danielxxomg:anvillink_repair_sign` PDC key, versioned BYTE_ARRAY, permanent namespace decoupled from display brand
+- [x] 4.4 RED test `SignLifecycleListenerTest` (create authorized): permitted player, valid front [repair]+HAND → blue text, PDC written
+- [x] 4.5 RED test `SignLifecycleListenerTest` (create unauthorized): no create permission → cancelled, no PDC — repair-signs Scenario: Unauthorized creation is rejected
+- [x] 4.6 RED test `SignLifecycleListenerTest` (break unauthorized): registered sign, no manage → cancelled, PDC unchanged — repair-signs Scenario: Unauthorized edit or break is cancelled
+- [x] 4.7 RED test `SignLifecycleListenerTest` (edit by manager): manage permission → proceeds, but text remains tampered until rerender
+- [x] 4.8 GREEN: implement `SignLifecycleListener` — SignChangeEvent (create), BlockBreakEvent (break), PDC check, permission gate
+- [x] 4.9 RED test `PdcNamespacePermanenceTest`: simulate display-brand rename → PDC namespace/key/schema unchanged, existing signs remain valid — platform-compliance Scenario: Display-brand change preserves identity
+- [x] 4.10 Verify: `./gradlew test` — PDC and lifecycle tests green
 
 ## Phase 5: Interaction Filter, Vault Gateway, Equipment Adapter — PR 5 (~380 lines)
 

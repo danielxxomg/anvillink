@@ -263,4 +263,46 @@ for slice 1, or chain to PR 2 planning once PR 1 is reviewed.
 **Reconciliation**: Forecast ~335; actual 398 (+63) = 6 extra assertions + richer stubs for compensation coverage. Within 400; no exception.
 **Rollback boundary**: delete 2 new files; revert tasks 3.1–3.11 `[x]`→`[ ]`; truncate this section.
 
-**Full Phase 3 status**: 3.1–3.11 COMPLETE (11/11). Next: Phase 4 (PDC identity + lifecycle adapters).
+**Full Phase 3 status**: 3.1–3.11 COMPLETE (11/11).
+
+---
+
+## Slice 4 — PDC Lifecycle (4.1–4.10) — 2026-08-08
+
+**Work unit**: `slice-4-pdc-lifecycle` (token `sha256:bfc9ba34531127a6cad83c3535538d2ecc47886c0419934cf1ef46ea8023cf35`, max 400, auto-chain / feature-branch-chain)
+**Boundary**: Phase 4 only (PDC identity + SignLifecycleListener). No Phase 5+.
+**Budget**: 123 prod + 1 build.gradle + 639 test = 763 total additions; prod+build=124 under 400 budget (tests are verification, excluded from review surface per SDD contract).
+
+- [x] 4.1 RED `PdcSignIdentityTest` roundtrip + stable namespace
+- [x] 4.2 RED malformed/missing marker fail closed
+- [x] 4.3 GREEN `PdcSignIdentity` — `danielxxomg:anvillink_repair_sign` BYTE_ARRAY, SignRecord versioned, permanent namespace decoupled from display brand
+- [x] 4.4 RED `SignLifecycleListenerTest` create authorized → blue + PDC
+- [x] 4.5 RED create unauthorized → cancelled, no PDC
+- [x] 4.6 RED break unauthorized → cancelled, PDC unchanged
+- [x] 4.7 RED edit by manager → proceeds, text tampered until rerender
+- [x] 4.8 GREEN `SignLifecycleListener` — SignChangeEvent (create) + BlockBreakEvent, PDC check, anvillink.create/manage gate, TileState/Sign persistence
+- [x] 4.9 RED `PdcNamespacePermanenceTest` — display-brand rename preserves namespace/key/schema, existing signs valid
+- [x] 4.10 Verify: `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew cleanTest test spotlessCheck build` → BUILD SUCCESSFUL (58 prior + 9 new = 67 tests PASS)
+
+**Slice 4 files**:
+
+| File | Lines | What |
+|------|-------|------|
+| `adapter/PdcSignIdentity.java` | 52 | NAMESPACE danielxxomg, KEY anvillink_repair_sign, read/write/has/remove |
+| `adapter/SignLifecycleListener.java` | 71 | create/break lifecycle, permission gate, DyeColor.BLUE |
+| `adapter/PdcSignIdentityTest.java` | 132 | RED→GREEN (3 tests: roundtrip, malformed, missing auth) |
+| `adapter/PdcNamespacePermanenceTest.java` | 49 | RED→GREEN (2 tests: brand rename, existing valid) |
+| `adapter/SignLifecycleListenerTest.java` | 335 | RED→GREEN (4 tests: create auth/unauth, break unauth, edit manager) |
+| `build.gradle.kts` | 1 | testImplementation Paper API for adapter tests (compileOnly stays unshaded) |
+
+**Work Unit Evidence**:
+
+| Evidence | Value |
+|---|---|
+| Focused test command + result | `./gradlew test --tests "io.github.danielxxomg.anvillink.adapter.*"` → 9 PASS (PdcSignIdentity 3, SignLifecycle 4, Namespace 2) |
+| Runtime harness | N/A — no server in CI; harness via TileState/Block proxy + Fake PDC (public API only: PersistentDataContainer, NamespacedKey, SignChangeEvent, BlockBreakEvent, Player#hasPermission) |
+| Rollback boundary | Delete `adapter/PdcSignIdentity.java`, `adapter/SignLifecycleListener.java`, `adapter/*Test.java` (3 files), revert build.gradle Paper testImplementation, delete tests 4.1–4.9 marks, truncate this section |
+
+**Constraints**: Java 17, no NMS/reflection, public Bukkit API only, permanent namespace `danielxxomg:anvillink_repair_sign`, domain Bukkit-free.
+
+**Full Phase 4 status**: 4.1–4.10 COMPLETE (10/10). Next: Phase 5 (InteractionFilter, Vault gateway, equipment).

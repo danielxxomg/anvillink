@@ -59,6 +59,7 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.snakeyaml) // parse plugin.yml in descriptor tests (test-only, never shaded)
+    testImplementation(libs.paper.api)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
