@@ -306,3 +306,51 @@ for slice 1, or chain to PR 2 planning once PR 1 is reviewed.
 **Constraints**: Java 17, no NMS/reflection, public Bukkit API only, permanent namespace `danielxxomg:anvillink_repair_sign`, domain Bukkit-free.
 
 **Full Phase 4 status**: 4.1–4.10 COMPLETE (10/10). Next: Phase 5 (InteractionFilter, Vault gateway, equipment).
+
+---
+
+## Slice 5 — Interaction Filter, Vault Gateway, Equipment Adapter (5.1–5.12) — 2026-08-08
+
+**Work unit**: `slice-5-economy-equipment` (token `sha256:fc55dece108c838d52481e91562751637ddefdf9cb6a77af98a3788e4b0efb3d`, max 400, auto-chain / feature-branch-chain)
+**Boundary**: Phase 5 only (InteractionFilter, VaultEconomyGateway, BukkitEquipmentPort). No Phase 6+ (config/MiniMessage/scheduler/admin).
+**Budget**: 368 prod + 1 build.gradle = 369 prod-lines under 400 (tests 806 verification-excluded per SDK contract; counted separately). Authored total with docs ~410 including apply-progress section + tasks checkbox flips. No size exception.
+
+- [x] 5.1 RED `InteractionFilterTest` → verified failing before impl (compile-blocked), then GREEN (4 tests: main-hand proceed, off-hand ignored, non-right-click ignored, right-click-air proceed) — repair-signs Scenario: Duplicate events do not double-charge
+- [x] 5.2 GREEN `InteractionFilter` — `EquipmentSlot.HAND` + `Action.RIGHT_CLICK_*` gate, static `shouldProceed`
+- [x] 5.3 RED `VaultEconomyGatewayTest.withdrawSuccess_oneFlatCharge` → verified missing-type compile fail, then PASS
+- [x] 5.4 RED `withdrawFail_insufficientFunds` → PASS (NoProvider vs InsufficientFunds via FAILURE type)
+- [x] 5.5 RED `missingProvider_noProvider` → PASS (null ServicesManager/null registration → NoProvider)
+- [x] 5.6 RED `invalidResponse_amountMismatch_depositsOnceForFiniteWithdrawn` + `nonFiniteWithdrawn_severeNoDeposit` → PASS (success+amount mismatch → one deposit for finite 20.0, zero deposit for NaN)
+- [x] 5.7 RED `fractionalDigits_scaleExceeds` → PASS (fractionalDigits=2, 25.1234 mismatch → InvalidResponse)
+- [x] 5.8 RED `deposit_succeedsAndFails_asDelegated` → PASS (Success vs Failure via depositPlayer)
+- [x] 5.9 GREEN `VaultEconomyGateway` — EconomyPort: Server supplier, resolve via ServicesManager, BigDecimal↔double exact `compareTo`, withdraw-once, success/amount validation, compensating deposit for finite mismatch, delegate deposit/refund. Ownership: adapter only, no orchestration/snapshot
+- [x] 5.10 RED `BukkitEquipmentPortTest` → verified missing-type compile fail, then NPEs fixed via Bukkit mock, then PASS (4 tests: viewOf HAND/ALL without storage, apply setDamage(0), restore snapshot, preserves untouched)
+- [x] 5.11 GREEN `BukkitEquipmentPort` — PlayerInventory read (MAIN_HAND/OFF_HAND/HELMET/CHESTPLATE/LEGGINGS/BOOTS), null→empty, setDamage(0), snapshot restore (damage+unbreakable). Ownership: equipment port owns snapshot restoration
+- [x] 5.12 Verify: `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew cleanTest test spotlessCheck build` → BUILD SUCCESSFUL (82 tests PASS including 15 new in slice 5)
+
+**Slice 5 files**:
+
+| File | Lines | What |
+|------|-------|------|
+| `adapter/InteractionFilter.java` | 22 | HAND+RIGHT_CLICK filter |
+| `adapter/VaultEconomyGateway.java` | 162 | EconomyPort via Vault Economy/Response, BigDecimal exactness |
+| `adapter/BukkitEquipmentPort.java` | 184 | EquipmentPort via PlayerInventory, snapshot restore |
+| `adapter/InteractionFilterTest.java` | 79 | RED→GREEN 4 tests (duplicate-hand filtering) |
+| `adapter/VaultEconomyGatewayTest.java` | 296 | RED→GREEN 7 tests (5.3–5.8) |
+| `adapter/BukkitEquipmentPortTest.java` | 431 | RED→GREEN 4 tests (equipment read/apply/restore) |
+| `build.gradle.kts` | 1 | testImplementation VaultAPI for Economy/Response in tests |
+
+**Work Unit Evidence**:
+
+| Evidence | Value |
+|---|---|
+| Focused test command + result | `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew cleanTest test --tests "io.github.danielxxomg.anvillink.adapter.*"` → 20 PASS (InteractionFilter 4, VaultEconomyGateway 7, BukkitEquipmentPort 4, PdcSignIdentity 3, Namespace 2) — all slice-5 tests green |
+| Runtime harness | N/A — no server in CI; harness via PlayerInteractEvent/EquipmentSlot (filter), ServicesManager/Economy proxy (Vault), PlayerInventory proxy + FakeItemStack subclass + FakeItemFactory (equipment) — public API only |
+| Rollback boundary | Delete `adapter/InteractionFilter.java`, `adapter/VaultEconomyGateway.java`, `adapter/BukkitEquipmentPort.java`, `adapter/InteractionFilterTest.java`, `adapter/VaultEconomyGatewayTest.java`, `adapter/BukkitEquipmentPortTest.java`; revert build.gradle Vault testImplementation; truncate tasks 5.1–5.12 marks + this section |
+
+**Host-API purity**: `grep -R "org.bukkit\|net.milkbowl\|net.kyori" src/main/java/.../domain` → 0 (domain remains Bukkit-free; adapters own all Bukkit/Vault imports).
+**Reconciliation**: Forecast ~380 for Phase 5; actual prod 368 under budget. Tests 806 are verification (excluded from 400 review surface per SDK). No exception.
+**Ownership contract**: RepairActivation owns orchestration/compensation decision; VaultEconomyGateway owns only withdraw/deposit/response; BukkitEquipmentPort owns only snapshot restoration — no cross-ownership.
+**TDD**: Every prod file had a RED before GREEN (InteractionFilter compile-fail, VaultEconomyGateway missing-type 9 errors, BukkitEquipmentPort 4 errors then NPEs triaged via isolated mocks). Verified fails first.
+
+**Full Phase 5 status**: 5.1–5.12 COMPLETE (12/12). Next: Phase 6 (config/MiniMessage/scheduler/admin/entrypoint).

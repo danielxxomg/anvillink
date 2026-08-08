@@ -103,18 +103,18 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 
 ## Phase 5: Interaction Filter, Vault Gateway, Equipment Adapter — PR 5 (~380 lines)
 
-- [ ] 5.1 RED test `InteractionFilterTest`: main-hand event→proceed, off-hand event→ignored, non-right-click→ignored — repair-signs Scenario: Duplicate events do not double-charge
-- [ ] 5.2 GREEN: implement `InteractionFilter` — check EquipmentSlot.HAND, block off-hand duplicate in activation listener
-- [ ] 5.3 RED test `VaultEconomyGatewayTest` (withdraw success): valid plan, provider returns success → TransactionResult.Success with amount — repair-economy Scenario: One successful activation has one flat charge
-- [ ] 5.4 RED test `VaultEconomyGatewayTest` (withdraw fail): provider returns !transactionSuccess → no mutation, no deposit — repair-economy Scenario: Insufficient funds do not repair
-- [ ] 5.5 RED test `VaultEconomyGatewayTest` (missing provider): no Economy registered → TransactionResult.NoProvider — repair-economy Scenario: Provider is unavailable
-- [ ] 5.6 RED test `VaultEconomyGatewayTest` (invalid response): success=true but amount mismatch → deposit once for finite withdrawn, otherwise severe evidence — economy response validation
-- [ ] 5.7 RED test `VaultEconomyGatewayTest` (fractionalDigits): price scale exceeds provider fractionalDigits → rejected — repair-economy Scenario: Invalid precision or value fails closed
-- [ ] 5.8 RED test `VaultEconomyGatewayTest` (compensation adapter): provider deposit/refund call succeeds/fails as delegated by use case — economy adapter contract for compensation
-- [ ] 5.9 GREEN: implement `VaultEconomyGateway` — EconomyPort: withdraw-once, BigDecimal conversion, provider response validation, delegate deposit/refund calls. Ownership: adapter only, no orchestration or snapshot restoration
-- [ ] 5.10 RED test `BukkitEquipmentPortTest`: resolve HAND/ALL from PlayerInventory, apply setDamage(0), restore from snapshot — equipment-repair Scenarios: Payment failure preserves equipment, Apply failure restores snapshots
-- [ ] 5.11 GREEN: implement `BukkitEquipmentPort` — read Bukkit PlayerInventory slots, setDamage(0), snapshot restore. Ownership: equipment port owns snapshot restoration
-- [ ] 5.12 Verify: `./gradlew test` — interaction, economy, equipment tests green
+- [x] 5.1 RED test `InteractionFilterTest`: main-hand event→proceed, off-hand event→ignored, non-right-click→ignored — repair-signs Scenario: Duplicate events do not double-charge
+- [x] 5.2 GREEN: implement `InteractionFilter` — check EquipmentSlot.HAND, block off-hand duplicate in activation listener
+- [x] 5.3 RED test `VaultEconomyGatewayTest` (withdraw success): valid plan, provider returns success → TransactionResult.Success with amount — repair-economy Scenario: One successful activation has one flat charge
+- [x] 5.4 RED test `VaultEconomyGatewayTest` (withdraw fail): provider returns !transactionSuccess → no mutation, no deposit — repair-economy Scenario: Insufficient funds do not repair
+- [x] 5.5 RED test `VaultEconomyGatewayTest` (missing provider): no Economy registered → TransactionResult.NoProvider — repair-economy Scenario: Provider is unavailable
+- [x] 5.6 RED test `VaultEconomyGatewayTest` (invalid response): success=true but amount mismatch → deposit once for finite withdrawn, otherwise severe evidence — economy response validation
+- [x] 5.7 RED test `VaultEconomyGatewayTest` (fractionalDigits): price scale exceeds provider fractionalDigits → rejected — repair-economy Scenario: Invalid precision or value fails closed
+- [x] 5.8 RED test `VaultEconomyGatewayTest` (compensation adapter): provider deposit/refund call succeeds/fails as delegated by use case — economy adapter contract for compensation
+- [x] 5.9 GREEN: implement `VaultEconomyGateway` — EconomyPort: withdraw-once, BigDecimal conversion, provider response validation, delegate deposit/refund calls. Ownership: adapter only, no orchestration or snapshot restoration
+- [x] 5.10 RED test `BukkitEquipmentPortTest`: resolve HAND/ALL from PlayerInventory, apply setDamage(0), restore from snapshot — equipment-repair Scenarios: Payment failure preserves equipment, Apply failure restores snapshots
+- [x] 5.11 GREEN: implement `BukkitEquipmentPort` — read Bukkit PlayerInventory slots, setDamage(0), snapshot restore. Ownership: equipment port owns snapshot restoration
+- [x] 5.12 Verify: `./gradlew test` — interaction, economy, equipment tests green
 
 ## Phase 6: Config, MiniMessage, Scheduler, Admin, Entrypoint — PR 6 (~285 lines)
 
