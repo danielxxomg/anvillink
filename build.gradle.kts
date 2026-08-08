@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.danielxxomg"
-version = "0.1.0-SNAPSHOT"
+version = "0.2.0"
 description = "AnvilLink: paid repair signs for Minecraft servers"
 
 repositories {

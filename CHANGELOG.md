@@ -5,7 +5,7 @@ All notable changes to AnvilLink will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] — BREAKING per-mode pricing + success feedback (MAJOR)
+## [0.2.0] — 2026-08-08 — BREAKING per-mode pricing + success feedback (MAJOR)
 
 ### BREAKING
 
@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `messages.repair-success: "<green>Repaired {count} items for {price}.</green>"` and `feedback:` block in `config.yml`; disabled feedback is silent, throw is swallowed.
 - `PricePerModeE2ETest` + `FeedbackE2ETest` (MockBukkit 4.110) covering per-mode withdrawals, scalar rejection, reload retention, paid HAND/ALL count/price, zero/disabled/throw-silence.
 
-## [Unreleased] — AnvilLink initial release
+## [0.1.0] — 2026-08-08 — AnvilLink initial release
 
 ### Added
 
