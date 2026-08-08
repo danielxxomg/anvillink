@@ -1,0 +1,46 @@
+# AnvilLink — Gentleman Guardian Angel (gga) Configuration
+# Stack: Java 17 / Paper 1.18.2 / Gradle 8.14.3
+# https://github.com/your-org/gga
+
+# How gga works (pre-commit reviewer):
+#   1. Git pre-commit hook (.git/hooks/pre-commit) runs `gga run || exit 1` — blocks commit on failure.
+#   2. gga collects staged files and filters by FILE_PATTERNS / EXCLUDE_PATTERNS.
+#   3. Reads RULES_FILE (AGENTS.md) as the review ruleset.
+#   4. Builds the review prompt via build_prompt() and executes:
+#        opencode run --model <model> --agent gga-reviewer -- "<prompt>"
+#   5. The agent response MUST start with `STATUS: PASSED` or `STATUS: FAILED` (STRICT_MODE=true).
+# Cache: results cached under ~/.cache/gga — use `gga run --no-cache` to force a fresh run.
+
+# AI Provider (required) — audited model for AnvilLink
+# Format: opencode:<provider>/<model-id>
+# Verified: commandcode/muse-spark-1.2-contributor exists in ~/.config/opencode/opencode.json
+#   id: meta/muse-spark-1.2-contributor | name: Muse Spark 1.2 Contributor
+#   context: 1050000 | output: 131072 | variants: high, max
+PROVIDER="opencode:commandcode/muse-spark-1.2-contributor"
+
+# OpenCode agent profile — lightweight pre-commit reviewer (keep prompt small, token overhead warning)
+OPENCODE_AGENT="gga-reviewer"
+
+# OpenCode reasoning variant — high is the balanced choice (muse-spark contributor supports high/max)
+OPENCODE_VARIANT="high"
+
+# File patterns to include in review (comma-separated globs, matched against staged paths)
+# Covers: Java sources, Gradle Kotlin DSL (build.gradle.kts, settings.gradle.kts), version catalog (libs.versions.toml),
+#         plugin/config YAML, properties, TOML, and docs. Tests (*Test.java) are intentionally INCLUDED.
+FILE_PATTERNS="*.java,*.kts,*.gradle.kts,*.yml,*.yaml,*.properties,*.toml,*.md"
+
+# File patterns to exclude from review (comma-separated)
+# Excludes only generated artifacts — do NOT exclude tests; do NOT use TS noise like *.test.ts
+EXCLUDE_PATTERNS="build/*,.gradle/*,.codegraph/*,gradle/wrapper/*,*.class,*.jar"
+
+# File containing code review rules
+RULES_FILE="AGENTS.md"
+
+# Strict mode: fail if AI response is ambiguous (must start with STATUS: PASSED/FAILED)
+STRICT_MODE="true"
+
+# Timeout in seconds for AI provider response (600s for Gradle/Java changesets + reasoning)
+TIMEOUT="600"
+
+# Base branch for --pr-mode (auto-detects main/master/develop if empty)
+# PR_BASE_BRANCH="main"

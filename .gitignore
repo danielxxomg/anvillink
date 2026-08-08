@@ -2,7 +2,9 @@
 build/
 out/
 *.class
+*.jar
 .DS_Store
 .atl/
-.gga
-opencode.json
+.codegraph/codegraph.db
+# project GGA + opencode agent are tracked — do NOT ignore
+# .gga and opencode.json stay versioned (GGA config + gga-reviewer agent)

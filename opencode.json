@@ -1,0 +1,30 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "gga-reviewer": {
+      "description": "Lightweight pre-commit reviewer for AnvilLink — validates staged files against AGENTS.md",
+      "model": "commandcode/muse-spark-1.2-contributor",
+      "prompt": "You are gga-reviewer, a lightweight pre-commit reviewer for AnvilLink (Paper 1.18.2 / Java 17). Validate staged files strictly against AGENTS.md. Start your response with STATUS: PASSED or STATUS: FAILED. If FAILED, list file:line, rule violated, description. Be concise. No extra tools.",
+      "tools": {
+        "read": true,
+        "bash": false,
+        "edit": false,
+        "write": false
+      }
+    }
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 30000
+  },
+  "mcp": {
+    "discord-py-self": { "enabled": false },
+    "nylas-dev": { "enabled": false },
+    "nylas-general": { "enabled": false },
+    "playwright": { "enabled": false },
+    "reactive-resume": { "enabled": false },
+    "scrapling": { "enabled": false },
+    "telegram": { "enabled": false }
+  }
+}
