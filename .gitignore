@@ -3,3 +3,6 @@ build/
 out/
 *.class
 .DS_Store
+.atl/
+.gga
+opencode.json
