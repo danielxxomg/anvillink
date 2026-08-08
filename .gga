@@ -22,7 +22,7 @@ PROVIDER="opencode:commandcode/muse-spark-1.2-contributor"
 OPENCODE_AGENT="gga-reviewer"
 
 # OpenCode reasoning variant — high is the balanced choice (muse-spark contributor supports high/max)
-OPENCODE_VARIANT="high"
+OPENCODE_VARIANT="max"
 
 # File patterns to include in review (comma-separated globs, matched against staged paths)
 # Covers: Java sources, Gradle Kotlin DSL (build.gradle.kts, settings.gradle.kts), version catalog (libs.versions.toml),
