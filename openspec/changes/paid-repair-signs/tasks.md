@@ -61,10 +61,12 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 
 ## Phase 2: Parser, Planner, Transaction Types — PR 2 (~315 lines)
 
-- [ ] 2.1 RED test `SignParserTest`: case-insensitive "[repair]" on line 1, "HAND"/"ALL" on line 2, wrong location rejected, empty/invalid rejected — repair-signs Scenario: Case-insensitive canonical creation, Wrong location is rejected
-- [ ] 2.2 GREEN: implement `SignParser` with `parse(String line1, String line2)` returning Optional\<ParseResult\>
-- [ ] 2.3 RED test `RepairPlannerTest`: HAND→main-hand only, ALL→six slots, excludes storage, skips empty/undamaged/unbreakable/non-Damageable — equipment-repair Scenarios: Mixed targets select only eligible, No eligible target creates no plan, Repeated planning is stable
-- [ ] 2.4 GREEN: implement `RepairPlanner` with `plan(mode, equipmentProvider)` returning RepairPlan with ordered PlannedSlot list + snapshots
+> **Slice 2 apply notes (2026-08-07) — partial, budget-constrained**: 2.1–2.4 complete (SignParser + RepairPlanner family) = 343 authored lines (7 prod + 2 test files). 2.5–2.10 deferred to slice 2b to stay ≤400 native limit (TransactionResult 112 lines, ValidatedPrice 103 lines, ports ~100 lines would exceed). All RED→GREEN verified; domain remains Bukkit/Vault-free.
+
+- [x] 2.1 RED test `SignParserTest`: case-insensitive "[repair]" on line 1, "HAND"/"ALL" on line 2, wrong location rejected, empty/invalid rejected — repair-signs Scenario: Case-insensitive canonical creation, Wrong location is rejected
+- [x] 2.2 GREEN: implement `SignParser` with `parse(String line1, String line2)` returning Optional\<ParseResult\>
+- [x] 2.3 RED test `RepairPlannerTest`: HAND→main-hand only, ALL→six slots, excludes storage, skips empty/undamaged/unbreakable/non-Damageable — equipment-repair Scenarios: Mixed targets select only eligible, No eligible target creates no plan, Repeated planning is stable
+- [x] 2.4 GREEN: implement `RepairPlanner` with `plan(mode, equipmentProvider)` returning RepairPlan with ordered PlannedSlot list + snapshots
 - [ ] 2.5 RED test `TransactionResultTest`: success with amount, fail-closed types (no-provider, insufficient-funds, invalid-response, apply-failure), compensation outcomes — repair-economy Scenario: Single withdrawal contract
 - [ ] 2.6 GREEN: implement `TransactionResult` sealed hierarchy (Success, NoProvider, InsufficientFunds, InvalidResponse, ApplyFailure, CompensationSuccess, CompensationFailed, RestorationFailed)
 - [ ] 2.7 RED test `ValidatedPriceTest`: finite non-negative accepted, negative/infinite/precision-overflow rejected, BigDecimal scale check against fractionalDigits

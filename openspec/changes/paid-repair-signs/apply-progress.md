@@ -151,7 +151,36 @@ javap -v .../RepairMode.class | grep "major version" → 61 (Java 17)
 - [ ] Phase 8 (PR 8): evidence schema, CI, docs, openspec/config.yaml testing section update
 - [ ] Phase 9 (PR 9): GitHub release publication — USER-AUTHORIZED GATE (blocked)
 
-## Status
+## Status (slice 1)
 
 **17/17 Phase 1 tasks complete. Slice 1 ready for candidate checking.** Next recommended: sdd-verify
 for slice 1, or chain to PR 2 planning once PR 1 is reviewed.
+
+---
+
+## Slice 2a — Parser + Planner (2.1–2.4) — 2026-08-07
+
+**Work unit**: `slice-2-domain-logic` (compact, ≤400)
+**Boundary**: 2.1–2.4 only (SignParser + RepairPlanner family); 2.5–2.10 → slice 2b
+**Budget**: 343 src + ≤40 docs = ≤393 total (tasks 10 + apply-progress 40 + src 343)
+
+- [x] 2.1 RED `SignParserTest` → GREEN (6 tests)
+- [x] 2.2 `SignParser` `parse(line1,line2)` → `Optional<ParseResult>` (pure domain)
+- [x] 2.3 RED `RepairPlannerTest` → GREEN (6 tests; HAND=1, ALL=6, no storage)
+- [x] 2.4 `RepairPlanner` + `RepairPlan` + `PlannedSlot` + `EquipmentView` + `ItemView` + `ItemSnapshot`
+
+**Slice 2a files (343 lines, 7 prod + 2 test)**:
+
+| File | Lines | Note |
+|------|-------|------|
+| `domain/SignParser.java` | 32 | `[repair]`+HAND/ALL parser |
+| `domain/ItemView.java` | 17 | slot view, no Bukkit |
+| `domain/ItemSnapshot.java` | 9 | opaque snapshot |
+| `domain/EquipmentView.java` | 10 | provider |
+| `domain/PlannedSlot.java` | 6 | ordered slot |
+| `domain/RepairPlan.java` | 24 | immutable plan |
+| `domain/RepairPlanner.java` | 39 | eligibility filter |
+| `domain/SignParserTest.java` | 58 | RED→GREEN 12 err→6 PASS |
+| `domain/RepairPlannerTest.java` | 148 | RED→GREEN 35 err→6 PASS |
+
+**Evidence**: `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew test` → 35 PASS (17+12+6), `spotlessCheck` PASS, `build` PASS, `grep Bukkit/Vault domain` → NO MATCH. Rollback: delete slice-2a 9 files + revert tasks 2.1–2.4.
