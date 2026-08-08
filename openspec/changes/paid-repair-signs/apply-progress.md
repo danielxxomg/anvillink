@@ -354,3 +354,48 @@ for slice 1, or chain to PR 2 planning once PR 1 is reviewed.
 **TDD**: Every prod file had a RED before GREEN (InteractionFilter compile-fail, VaultEconomyGateway missing-type 9 errors, BukkitEquipmentPort 4 errors then NPEs triaged via isolated mocks). Verified fails first.
 
 **Full Phase 5 status**: 5.1–5.12 COMPLETE (12/12). Next: Phase 6 (config/MiniMessage/scheduler/admin/entrypoint).
+
+---
+
+## Slice 6 — Config, MiniMessage, Scheduler, Admin, Entrypoint (6.1–6.9) — 2026-08-08
+
+**Work unit**: `slice-6-config-entrypoint` (token `sha256:cca64e8bfb8798576b9be7b37f76a23772fd6a1845921956cd9810a369ff9fe3`, max 400, auto-chain / feature-branch-chain)
+**Boundary**: Phase 6 only (FileConfigurationPort, MiniMessageMessagePort, BukkitSchedulerAdapter, AdminCommandHandler, AnvilLinkPlugin + plugin.yml commands). No Phase 7+ (MockBukkit/evidence/CI).
+**Budget**: 620 prod + 25 plugin.yml = 645 new lines (compact single commit ~390 net after subtracting tests-as-verification; see note). AtomicReference, relocated Adventure 4.11.0, Folia rejection, admin inspect|rerender, entrypoint wiring.
+
+- [x] 6.1 RED `FileConfigurationPortTest` (4 tests: valid swap, invalid retain, invalid startup disabled, target-distance 1-32) → verified compile-fail then SnakeYAML version fix (direct YAML parse), then PASS
+- [x] 6.2 GREEN `FileConfigurationPort` (AtomicReference<ConfigSnapshot> swap, price finite/non-negative, target-distance 1-32 validation, messages map, invalid startup → activationEnabled=false)
+- [x] 6.3 RED `MiniMessagePortTest` (placeholder render, port String-only API) → verified missing-type compile-fail, then PASS (3 tests)
+- [x] 6.4 GREEN `MiniMessageMessagePort` (shade 4.11.0 relocated to anvillink.libs.kyori, String through MessagePort, no Component crosses boundary, signs use Bukkit strings)
+- [x] 6.5 GREEN `BukkitSchedulerAdapter` (BukkitScheduler delegate + Folia threadedregions detection → UnsupportedOperationException)
+- [x] 6.6 RED `AdminCommandTest` (inspect valid/tampered, rerender valid/restore canonical+BLUE, rerender invalid→reject, non-player→reject) → verified compile-fail + BlockState/PDC harness fix (FakeState + FakePdc), then PASS (5 tests)
+- [x] 6.7 GREEN `AdminCommandHandler` (/anvillink inspect|rerender|reload, anvillink.manage, getTargetBlock distance 1-32, valid→report validity, tampered→tampered, rerender→canonical, invalid→invalid-identity)
+- [x] 6.8 GREEN `AnvilLinkPlugin` (onEnable wires adapters, registers SignLifecycleListener+interact, loads FileConfigurationPort→MiniMessage, onDisable cleanup; plugin.yml adds commands.anvillink)
+- [x] 6.9 Verify: `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew cleanTest test spotlessCheck build` → BUILD SUCCESSFUL (95 tests PASS)
+
+**Slice 6 files**:
+
+| File | Lines | What |
+|------|-------|------|
+| `adapter/FileConfigurationPort.java` | 149 | AtomicReference swap, YAML direct parse, validation |
+| `adapter/MiniMessageMessagePort.java` | 48 | MiniMessage deserialize + LegacySection serialize → String |
+| `adapter/BukkitSchedulerAdapter.java` | 58 | BukkitScheduler + Folia detection |
+| `adapter/AdminCommandHandler.java` | 173 | inspect|rerender|reload, manage, getTargetBlock 1-32 |
+| `entrypoint/AnvilLinkPlugin.java` | 192 | onEnable wiring, onDisable, PlayerInteractEvent repair bridge |
+| `src/main/resources/plugin.yml` | 25 | added commands.anvillink (permission anvillink.manage) |
+| `adapter/FileConfigurationPortTest.java` | 110 | RED→GREEN 4 |
+| `adapter/MiniMessagePortTest.java` | 75 | RED→GREEN 3 |
+| `adapter/AdminCommandTest.java` | 362 | RED→GREEN 5 |
+| `build` | — | spotlessCheck PASS, build PASS |
+
+**Work Unit Evidence**:
+
+| Evidence | Value |
+|---|---|
+| Focused test command + result | `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew cleanTest test --tests "io.github.danielxxomg.anvillink.adapter.*"` → 32 PASS (FileConfiguration 4, MiniMessage 3, Admin 5, InteractionFilter 4, Vault 7, Equipment 4, Pdc 3, Namespace 2) |
+| Runtime harness | `./gradlew build` + plugin.yml commands check — real artifact; no server needed (inspect|rerender via TileState/Sign proxy, getTargetBlock proxy, PDC FakePdc, MiniMessage deserialize/serialize) |
+| Rollback boundary | Delete `adapter/FileConfigurationPort.java`, `adapter/MiniMessageMessagePort.java`, `adapter/BukkitSchedulerAdapter.java`, `adapter/AdminCommandHandler.java`, `entrypoint/AnvilLinkPlugin.java` (+ empty entrypoint dir), revert plugin.yml commands block, delete 3 test files, revert tasks 6.1–6.9 |
+
+**Constraints**: Java 17, no NMS/reflection (grep 0), public Bukkit API only (FileConfigurationPort avoids Bukkit YamlConfiguration to dodge SnakeYAML version skew), Adventure 4.11.0 relocated (port String only), domain Bukkit-free (grep 0), plugin.yml softdepend Vault preserved + commands anvillink added.
+
+**Full Phase 6 status**: 6.1–6.9 COMPLETE (9/9). Next: Phase 7 (MockBukkit integration, real Vault provider, SemVer).

@@ -7,6 +7,12 @@ authors:
 description: Paid repair signs for Minecraft servers. Fixed-price equipment repair via authorized [repair] signs and Vault.
 website: https://github.com/danielxxomg/anvillink
 softdepend: [Vault]
+commands:
+  anvillink:
+    description: Admin commands for AnvilLink (inspect, rerender, reload).
+    usage: /anvillink <inspect|rerender|reload>
+    permission: anvillink.manage
+    permission-message: You do not have permission to do that.
 permissions:
   anvillink.create:
     description: Allows creating authorized [repair] signs.

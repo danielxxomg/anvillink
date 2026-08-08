@@ -62,7 +62,7 @@ class PdcSignIdentityTest {
     assertTrue(PdcSignIdentity.read(holder).isEmpty());
   }
 
-  static final class FakePdc implements PersistentDataContainer {
+  static class FakePdc implements PersistentDataContainer {
     private final Map<NamespacedKey, Object> map = new HashMap<>();
 
     @Override

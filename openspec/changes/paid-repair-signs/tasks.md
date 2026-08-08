@@ -118,15 +118,15 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 
 ## Phase 6: Config, MiniMessage, Scheduler, Admin, Entrypoint — PR 6 (~285 lines)
 
-- [ ] 6.1 RED test `FileConfigurationPortTest`: valid reload → atomically swap; invalid reload → retain prior, report failure; invalid startup → disable activation — repair-signs Scenarios: Valid reload changes presentation, Invalid reload fails deterministically, Invalid initial configuration fails closed
-- [ ] 6.2 GREEN: implement `FileConfigurationPort` with AtomicReference\<ConfigSnapshot\> swap
-- [ ] 6.3 RED test `MiniMessagePortTest`: supply a configured MiniMessage template with placeholder, call `MessagePort.render()`, assert returned String matches expected Bukkit-facing output; assert return type is `String` and no Adventure types (`Component`, `TagResolver`, etc.) appear in the port's public API signature — repair-signs Scenario: Valid reload changes presentation (MiniMessage renders through isolated/relocated implementation)
-- [ ] 6.4 GREEN: implement `MiniMessageMessagePort` — shade Adventure 4.11.0, expose String through port, no relocated type crosses port boundary, signs use Bukkit strings/color not MiniMessage
-- [ ] 6.5 GREEN: implement `BukkitSchedulerAdapter` — delegate to BukkitScheduler, reject Folia via `io.papermc.paper.threadedregions` detection
-- [ ] 6.6 RED test `AdminCommandTest`: inspect valid→report validity, inspect tampered→report tampered, rerender valid→restore canonical text, rerender invalid identity→reject — repair-signs Scenarios: Tampered text is rejected, Valid identity is re-rendered
-- [ ] 6.7 GREEN: implement `/anvillink inspect|rerender` — player/manage permission, line-of-sight targeting, configurable distance 1–32 (default 8)
-- [ ] 6.8 GREEN: implement `AnvilLinkPlugin` entrypoint — onEnable wires adapters, registers listeners, loads config; onDisable cleanup
-- [ ] 6.9 Verify: `./gradlew test` — config, MiniMessage, admin, entrypoint tests green
+- [x] 6.1 RED test `FileConfigurationPortTest`: valid reload → atomically swap; invalid reload → retain prior, report failure; invalid startup → disable activation — repair-signs Scenarios: Valid reload changes presentation, Invalid reload fails deterministically, Invalid initial configuration fails closed
+- [x] 6.2 GREEN: implement `FileConfigurationPort` with AtomicReference\<ConfigSnapshot\> swap
+- [x] 6.3 RED test `MiniMessagePortTest`: supply a configured MiniMessage template with placeholder, call `MessagePort.render()`, assert returned String matches expected Bukkit-facing output; assert return type is `String` and no Adventure types (`Component`, `TagResolver`, etc.) appear in the port's public API signature — repair-signs Scenario: Valid reload changes presentation (MiniMessage renders through isolated/relocated implementation)
+- [x] 6.4 GREEN: implement `MiniMessageMessagePort` — shade Adventure 4.11.0, expose String through port, no relocated type crosses port boundary, signs use Bukkit strings/color not MiniMessage
+- [x] 6.5 GREEN: implement `BukkitSchedulerAdapter` — delegate to BukkitScheduler, reject Folia via `io.papermc.paper.threadedregions` detection
+- [x] 6.6 RED test `AdminCommandTest`: inspect valid→report validity, inspect tampered→report tampered, rerender valid→restore canonical text, rerender invalid identity→reject — repair-signs Scenarios: Tampered text is rejected, Valid identity is re-rendered
+- [x] 6.7 GREEN: implement `/anvillink inspect|rerender` — player/manage permission, line-of-sight targeting, configurable distance 1–32 (default 8)
+- [x] 6.8 GREEN: implement `AnvilLinkPlugin` entrypoint — onEnable wires adapters, registers listeners, loads config; onDisable cleanup
+- [x] 6.9 Verify: `./gradlew test` — config, MiniMessage, admin, entrypoint tests green
 
 ## Phase 7: MockBukkit Integration, Real Vault Provider, SemVer — PR 7 (~390 lines)
 
