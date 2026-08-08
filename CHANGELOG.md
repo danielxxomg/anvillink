@@ -5,6 +5,19 @@ All notable changes to AnvilLink will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-08-08 — BREAKING per-world pricing + floor >=0 + audit log (MAJOR)
+
+### BREAKING
+
+- Floor relaxed `MoneyAmount.MIN_PRICE=10_000` → `>=0` (finite non-negative `representableAt(fractionalDigits)` at activation). `0` and `100` now accepted when representable; `12000/25000` defaults unchanged but `100` no longer rejected. Migration: operators relying on 10k rejection should enforce own minimum; `config.yml` values remain valid.
+- `config.yml` adds optional `worlds:` map: each `worlds.<world>` MAY contain `hand` and/or `all` (partial — missing key falls back to global `price.hand`/`price.all`). Present values MUST be finite `>=0`. Lookup via `player.getWorld().getName()` exact case-sensitive; unknown/null/empty `worldName` → global. Present malformed (unparseable/negative/non-finite) `worlds.<world>.hand/all` fails whole file closed (retain prior). Per-world scale validated at activation via `ValidatedPrice.of(effective, fractionalDigits)` fail-closed no withdrawal.
+- `ConfigurationPort.ConfigSnapshot` gains `Map<String, WorldPrice> worldPrices` (`WorldPrice(hand,all)` nullable per-field, unmodifiable defensive copy, `AtomicReference` swap). `RepairActivation.activate(SignId, UUID, String worldName)` seam `String` only (no `org.bukkit.*`), overload `activate(id,uuid)` delegates `worldName=null`.
+
+### Added
+
+- New capability `audit-log`: fixed `plugins/AnvilLink/audit.log` (`mkdirs`+`CREATE|APPEND`) appended ONLY on paid `Success(amount!=ZERO)` with fields `ISO_INSTANT|uuid|name|HAND/ALL|world|toPlainString|count|SUCCESS`; zero/empty and all failures not audited. `AuditPort` pure + `FileAuditAdapter` swallowed `IOException`; caller double-swallow → never affects transaction/compensation/feedback. File is unbounded, no auto-rotation — operator rotates by renaming/deleting, plugin recreates on next paid success; cleartext `UUID`+`name` retained, operator owns GDPR retention.
+- `FileAuditAdapter` format tests + `AuditE2ETest`/`WorldAwarePricingE2ETest`/`WorldAwarePricingE2ETestFull` (MockBukkit 4.110), `FileConfigurationPortWorldsTest`/`RepairActivationWorldTest`; `config.yml` header fixes `v0.3.0` BREAKING worlds + fixed audit path/rotation/privacy note.
+
 ## [0.2.0] — 2026-08-08 — BREAKING per-mode pricing + success feedback (MAJOR)
 
 ### BREAKING

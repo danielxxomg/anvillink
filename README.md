@@ -8,7 +8,7 @@ Paid repair signs for Paper servers — players create `[repair]` signs (HAND or
 2. Drop `anvillink-*.jar` into `plugins/`, restart.
 3. Give `anvillink.create` to builders, `anvillink.use` to players (default true), `anvillink.manage` to admins.
 4. Place a sign: line 1 `[repair]`, line 2 `HAND` or `ALL` (case-insensitive) on the front side — it turns blue and registers.
-5. Right-click the sign with the main hand to repair. Economy is charged once (flat per-mode price: `price.hand 12000` / `price.all 25000`, each `>= 10000`) on success; otherwise the repair is cancelled and equipment is preserved.
+5. Right-click the sign with the main hand to repair. Economy is charged once (per-mode price: `price.hand 12000` / `price.all 25000`, each `>= 0`, optional `worlds:` overrides per world with global fallback) on success; otherwise the repair is cancelled and equipment is preserved.
 
 ## Support tiers (evidence-gated)
 
@@ -38,12 +38,17 @@ Signing identity is the PDC key `danielxxomg:anvillink_repair_sign` (versioned b
 
 ## Configuration (`plugins/AnvilLink/config.yml`)
 
-> BREAKING (MAJOR): `price` is now per-mode `price.hand` + `price.all` (each `>= 10_000`, flat scalar `price: 25.00` is INVALID). Migration: replace `price: 25.00` with `price.hand: 12000.00` / `price.all: 25000.00`. Invalid startup → `activationEnabled=false` until fixed; invalid reload retains prior valid config atomically.
+> BREAKING (MAJOR v0.3.0): `price` is per-mode `price.hand` + `price.all` (each `>= 0`, flat scalar `price: 25.00` is INVALID) with optional `worlds:` overrides (`worlds.<world>.hand/all` partial, missing key → global, case-sensitive exact, malformed `worlds:` entry fails whole file closed). Migration: `price` floor relaxed `>=10_000`→`>=0`; `worlds:` is optional. Invalid startup → `activationEnabled=false` until fixed; invalid reload retains prior valid config atomically.
 
 ```yaml
 price:
-  hand: 12000.00 # mandatory >= 10_000, per HAND (1 slot)
-  all:  25000.00 # mandatory >= 10_000, per ALL (6 slots)
+  hand: 12000.00 # mandatory >= 0, per HAND (1 slot)
+  all:  25000.00 # mandatory >= 0, per ALL (6 slots)
+worlds: # optional per-world overrides (partial); example commented
+#  world:
+#    hand: 5000
+#  world_nether:
+#    all: 1000
 feedback:
   enabled: true
   sound: BLOCK_ANVIL_USE
@@ -59,7 +64,7 @@ messages:
   # ... MiniMessage templates (reload with /anvillink reload)
 ```
 
-Reload: `/anvillink reload` (manage). Valid reload swaps atomically; invalid reload keeps the prior config and reports failure. Invalid startup disables activation until fixed. `feedback.enabled=false` silences sound/particles/message for paid `repair-success` (still gated on `amount != ZERO`); feedback failures are swallowed and never trigger compensation.
+Reload: `/anvillink reload` (manage). Valid reload swaps atomically; invalid reload keeps the prior config and reports failure. Invalid startup disables activation until fixed. `feedback.enabled=false` silences sound/particles/message for paid `repair-success` (still gated on `amount != ZERO`); feedback failures are swallowed and never trigger compensation. Paid `Success` also appends `plugins/AnvilLink/audit.log` (`ISO_INSTANT|uuid|name|HAND/ALL|world|toPlainString|count|SUCCESS`, fixed path `CREATE|APPEND`+`mkdirs`, unbounded — rotate by renaming/deleting, cleartext IDs, operator owns GDPR).
 
 ## FAQ
 
@@ -83,7 +88,7 @@ GPL-3.0-or-later. See `LICENSE`.
   "applicationCategory": "GameApplication",
   "operatingSystem": "Paper 1.18.2+",
   "license": "https://www.gnu.org/licenses/gpl-3.0.html",
-  "softwareVersion": "0.2.0",
+  "softwareVersion": "0.3.0",
   "url": "https://github.com/danielxxomg/anvillink",
   "description": "Paid repair signs for Minecraft Paper servers — fixed-price HAND/ALL equipment repair via Vault.",
   "author": { "@type": "Person", "name": "danielxxomg" }
