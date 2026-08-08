@@ -79,6 +79,9 @@ class PluginDescriptorTest {
       return stream
           .filter(p -> p.getFileName().toString().startsWith("anvillink-"))
           .filter(p -> p.getFileName().toString().endsWith(".jar"))
+          .filter(p -> !p.getFileName().toString().contains("-sources"))
+          .filter(p -> !p.getFileName().toString().contains("-javadoc"))
+          .sorted()
           .findFirst()
           .orElseThrow(() -> new IllegalStateException("no anvillink JAR in build/libs"));
     }

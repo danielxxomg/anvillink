@@ -15,4 +15,9 @@ jobs:
       - name: Gradle build
         run: |
           export GRADLE_USER_HOME="$PWD/.gradle"
-          mise x java@21.0.2 -- ./gradlew cleanTest test spotlessCheck build
+          mise x java@21.0.2 -- ./gradlew clean build spotlessCheck
+      - name: Verify JAR
+        if: always()
+        run: |
+          unzip -p build/libs/anvillink-*.jar plugin.yml | head -n 5
+          jar tf build/libs/anvillink-*.jar | grep -c "paper\|vault" || true
