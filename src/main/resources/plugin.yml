@@ -1,0 +1,19 @@
+name: AnvilLink
+main: io.github.danielxxomg.anvillink.entrypoint.AnvilLinkPlugin
+version: '${version}'
+api-version: 1.13
+authors:
+  - danielxxomg
+description: Paid repair signs for Minecraft servers. Fixed-price equipment repair via authorized [repair] signs and Vault.
+website: https://github.com/danielxxomg/anvillink
+softdepend: [Vault]
+permissions:
+  anvillink.create:
+    description: Allows creating authorized [repair] signs.
+    default: op
+  anvillink.use:
+    description: Allows using authorized [repair] signs to repair equipment.
+    default: true
+  anvillink.manage:
+    description: Allows editing, breaking, inspecting, and re-rendering registered repair signs.
+    default: op

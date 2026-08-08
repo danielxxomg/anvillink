@@ -1,0 +1,29 @@
+# AnvilLink default configuration.
+# Reload with /anvillink reload (admin) — see messages below for operator output.
+
+# Fixed price per successful activation, in the provider's currency.
+# Must be finite and non-negative; precision is validated against the
+# configured economy provider (invalid values fail closed).
+price: 25.00
+
+admin:
+  # Line-of-sight targeting distance for /anvillink inspect and /anvillink rerender.
+  # Valid range: 1–32.
+  target-distance: 8
+
+# Reloadable messages (MiniMessage templates). Reload is atomic: an invalid
+# replacement retains the last valid configuration and reports a failure.
+messages:
+  create-success: "<green>Repair sign created.</green>"
+  create-failure: "<red>Could not create repair sign: <white>{reason}</white></red>"
+  no-permission: "<red>You do not have permission to do that.</red>"
+  no-target: "<red>No sign in sight within <white>{distance}</white> blocks.</red>"
+  not-registered: "<yellow>That sign is not a registered repair sign.</yellow>"
+  invalid-identity: "<red>That sign has an invalid repair identity and is not usable.</red>"
+  tampered: "<red>That sign's text has been tampered with and is not usable.</red>"
+  rerender-success: "<green>Repair sign re-rendered to canonical text.</green>"
+  reload-success: "<green>Configuration reloaded.</green>"
+  reload-failure: "<red>Configuration reload failed: <white>{reason}</white></red>"
+  activation-failure: "<red>Repair failed: <white>{reason}</white></red>"
+  no-eligible-items: "<yellow>No damaged repairable items to repair.</yellow>"
+  insufficient-funds: "<red>You do not have enough funds.</red>"
