@@ -107,6 +107,22 @@ class PdcSignIdentityTest {
     }
 
     @Override
+    public void readFromBytes(byte[] bytes, boolean clear) throws java.io.IOException {}
+
+    @Override
+    public byte[] serializeToBytes() throws java.io.IOException {
+      return new byte[0];
+    }
+
+    @Override
+    public void copyTo(org.bukkit.persistence.PersistentDataContainer other, boolean replace) {}
+
+    @Override
+    public int getSize() {
+      return map.size();
+    }
+
+    @Override
     public org.bukkit.persistence.PersistentDataAdapterContext getAdapterContext() {
       return null;
     }

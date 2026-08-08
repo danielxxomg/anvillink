@@ -130,24 +130,24 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 
 ## Phase 7: MockBukkit Integration, Real Vault Provider, SemVer — PR 7 (~390 lines)
 
-- [ ] 7.1 MockBukkit E2E: create sign with permission → blue text + PDC, right-click repairs HAND, verify one charge — repair-signs Scenarios: Case-insensitive canonical creation + end-to-end
-- [ ] 7.2 MockBukkit: create without permission → no PDC, no record — repair-signs Scenario: Unauthorized creation is rejected
-- [ ] 7.3 MockBukkit: edit/break registered sign without manage → cancelled, PDC unchanged — repair-signs Scenario: Unauthorized edit or break is cancelled
-- [ ] 7.4 MockBukkit: tampered text activation → fail closed, no charge — repair-signs Scenario: Tampered text is rejected
-- [ ] 7.5 MockBukkit: ALL mode repairs six slots, storage untouched — equipment-repair Scenario: ALL excludes storage
-- [ ] 7.6 MockBukkit: no eligible items → no Vault call — repair-economy Scenario: Undamaged or ineligible equipment is free
-- [ ] 7.7 MockBukkit: insufficient funds → no repair, items unchanged — repair-economy Scenario: Insufficient funds do not repair
-- [ ] 7.8 MockBukkit: duplicate hand events → one activation, one charge — repair-signs Scenario: Duplicate events do not double-charge
-- [ ] 7.9 MockBukkit: Vault absent → fail closed diagnostic — repair-economy Scenario: Provider is unavailable
-- [ ] 7.10 MockBukkit: admin inspect/rerender on tampered sign → restores canonical — repair-signs Scenario: Valid identity is re-rendered
-- [ ] 7.11 MockBukkit: reload valid→swaps; reload invalid→retains prior — repair-signs Scenarios: Valid reload changes presentation, Invalid reload fails deterministically
-- [ ] 7.12 RED test `RealVaultProviderSetup`: verify and pin official EssentialsX release compatible with selected Paper runtime; record source URL, exact version, SHA-256 checksum, and GPL-2.0 license. No standalone/custom/fake provider fallback satisfies this task
-- [ ] 7.13 RED test `VaultProviderIntegrationTest`: wire official Vault + pinned official EssentialsX Economy on real Paper runtime, verify withdrawal + repair end-to-end — platform-compliance Scenario: Incomplete evidence blocks release claims (real Vault-provider path required)
-- [ ] 7.14 RED test `MissingRealProviderBlocksClaimTest`: given unit + MockBukkit + fake-provider pass but real Vault-provider evidence is missing, verify release claim is blocked — platform-compliance negative test: missing/failed real-provider evidence prohibits the corresponding release claim
-- [ ] 7.15 GREEN: implement real Vault-provider integration test using pinned official EssentialsX Economy on real Paper runtime; assert claim blocked when evidence missing
-- [ ] 7.16 RED test `SemVerSeparationTest`: verify SemVer value and compatibility matrix are published as separate claims, matrix update does not bump version — platform-compliance Scenario: Version and tested range stay distinct
-- [ ] 7.17 GREEN: implement SemVer/matrix separation validation in build metadata
-- [ ] 7.18 Verify: `./gradlew test` — all integration, real-provider, negative-evidence, and SemVer tests green
+- [x] 7.1 MockBukkit E2E: create sign with permission → blue text + PDC, right-click repairs HAND, verify one charge — repair-signs Scenarios: Case-insensitive canonical creation + end-to-end
+- [x] 7.2 MockBukkit: create without permission → no PDC, no record — repair-signs Scenario: Unauthorized creation is rejected
+- [x] 7.3 MockBukkit: edit/break registered sign without manage → cancelled, PDC unchanged — repair-signs Scenario: Unauthorized edit or break is cancelled
+- [x] 7.4 MockBukkit: tampered text activation → fail closed, no charge — repair-signs Scenario: Tampered text is rejected
+- [x] 7.5 MockBukkit: ALL mode repairs six slots, storage untouched — equipment-repair Scenario: ALL excludes storage
+- [x] 7.6 MockBukkit: no eligible items → no Vault call — repair-economy Scenario: Undamaged or ineligible equipment is free
+- [x] 7.7 MockBukkit: insufficient funds → no repair, items unchanged — repair-economy Scenario: Insufficient funds do not repair
+- [x] 7.8 MockBukkit: duplicate hand events → one activation, one charge — repair-signs Scenario: Duplicate events do not double-charge
+- [x] 7.9 MockBukkit: Vault absent → fail closed diagnostic — repair-economy Scenario: Provider is unavailable
+- [x] 7.10 MockBukkit: admin inspect/rerender on tampered sign → restores canonical — repair-signs Scenario: Valid identity is re-rendered
+- [x] 7.11 MockBukkit: reload valid→swaps; reload invalid→retains prior — repair-signs Scenarios: Valid reload changes presentation, Invalid reload fails deterministically
+- [x] 7.12 RED test `RealVaultProviderSetup`: verify and pin official EssentialsX release compatible with selected Paper runtime; record source URL, exact version, SHA-256 checksum, and GPL-2.0 license. No standalone/custom/fake provider fallback satisfies this task
+- [x] 7.13 RED test `VaultProviderIntegrationTest`: wire official Vault + pinned official EssentialsX Economy on real Paper runtime, verify withdrawal + repair end-to-end — platform-compliance Scenario: Incomplete evidence blocks release claims (real Vault-provider path required)
+- [x] 7.14 RED test `MissingRealProviderBlocksClaimTest`: given unit + MockBukkit + fake-provider pass but real Vault-provider evidence is missing, verify release claim is blocked — platform-compliance negative test: missing/failed real-provider evidence prohibits the corresponding release claim
+- [x] 7.15 GREEN: implement real Vault-provider integration test using pinned official EssentialsX Economy on real Paper runtime; assert claim blocked when evidence missing
+- [x] 7.16 RED test `SemVerSeparationTest`: verify SemVer value and compatibility matrix are published as separate claims, matrix update does not bump version — platform-compliance Scenario: Version and tested range stay distinct
+- [x] 7.17 GREEN: implement SemVer/matrix separation validation in build metadata
+- [x] 7.18 Verify: `./gradlew test` — all integration, real-provider, negative-evidence, and SemVer tests green
 
 ## Phase 8: Evidence Schema, CI, Docs — PR 8 (~310 lines)
 

@@ -21,16 +21,22 @@ repositories {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
         vendor = JvmVendorSpec.ADOPTIUM
     }
     withSourcesJar()
 }
 
-// Compile floor: --release 17 (bytecode major 61) regardless of the JDK running the build.
+// Compile floor: prod --release 17 (bytecode major 61) regardless of the toolchain JDK.
+// Test sources need --release 21 to consume MockBukkit 4.110.0 (Java 21 bytecode).
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(17)
     options.encoding = "UTF-8"
+    if (name == "compileTestJava") {
+        javaCompiler.set(javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+        options.release.set(21)
+    } else {
+        options.release.set(17)
+    }
 }
 
 // Expand ${version} in plugin.yml (and any other resource tokens) at build time.
@@ -55,12 +61,18 @@ dependencies {
     // Adventure (MiniMessage) IS shaded/relocated (design: pin 4.11.0, relocate).
     implementation(libs.adventure.minimessage)
 
-    // Tests: JUnit 5 platform. MockBukkit arrives in Phase 7 (pin corrected then).
+    // Tests: JUnit 5 platform. MockBukkit 4.110.0 on the 1.21 line (JDK 21 test runtime).
+    // Paper 1.21.11 artifact provides Folia types (threadedregions) required by MockBukkit 4.x at runtime.
+    // Production compile floor remains Paper 1.18.2 / --release 17 (never shaded).
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.snakeyaml) // parse plugin.yml in descriptor tests (test-only, never shaded)
-    testImplementation(libs.paper.api)
-    testImplementation(libs.vault.api)
+    // Keep compileOnly Paper 1.18.2; add 1.21 runtime for MockBukkit Folia types without duplicate Bukkit capability.
+    testImplementation(libs.paper.api.test)
+    testImplementation(libs.vault.api) {
+        exclude(group = "org.bukkit", module = "bukkit")
+    }
+    testImplementation(libs.mockbukkit.v121)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -68,6 +80,7 @@ tasks.test {
     useJUnitPlatform()
     // Descriptor + bytecode-floor tests inspect the assembled release JAR.
     dependsOn(tasks.shadowJar)
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
     testLogging {
         events("passed", "failed", "skipped")
         showStandardStreams = false

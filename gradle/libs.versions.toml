@@ -1,21 +1,21 @@
-# AnvilLink version catalog — slice 1 pins.
+# AnvilLink version catalog — slice 7 pins (MockBukkit 4.x).
 # Host APIs (Paper, Vault) are compileOnly and never shaded; see build.gradle.kts.
-# NOTE: "MockBukkit 3.x" from tasks.md is stale. Current MockBukkit line is
-# org.mockbukkit.mockbukkit:mockbukkit-v1.21 (PaperMC/Maven Central), latest 4.x.
-# Phase 1 uses no MockBukkit (integration starts in Phase 7); the pin will be
-# corrected to the resolvable 4.x line when the integration slice lands.
+# MockBukkit 4.110.0 is the pinned 4.x line (org.mockbukkit.mockbukkit:mockbukkit-v1.21)
+# compatible with Paper 1.21.x / JDK 21 test runtime; prod compile floor remains Paper 1.18.2 / Java 17.
 [versions]
 paper-api = "1.18.2-R0.1-SNAPSHOT"
+paper-api-test = "1.21.11-R0.1-SNAPSHOT"
 vault-api = "1.7"
 junit = "5.10.2"
 snakeyaml = "2.2"
-mockbukkit = "unused-in-slice-1"          # corrected in Phase 7 (see note above)
+mockbukkit = "4.110.0"
 adventure-minimessage = "4.11.0"
 spotless = "6.25.0"
 shadow = "8.3.6"
 
 [libraries]
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+paper-api-test = { module = "io.papermc.paper:paper-api", version.ref = "paper-api-test" }
 vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault-api" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
@@ -23,6 +23,7 @@ snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 adventure-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-minimessage" }
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure-minimessage" }
 adventure-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure-minimessage" }
+mockbukkit-v121 = { module = "org.mockbukkit.mockbukkit:mockbukkit-v1.21", version.ref = "mockbukkit" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

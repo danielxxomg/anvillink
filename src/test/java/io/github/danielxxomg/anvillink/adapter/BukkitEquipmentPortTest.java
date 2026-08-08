@@ -9,8 +9,6 @@ import io.github.danielxxomg.anvillink.domain.ItemSnapshot;
 import io.github.danielxxomg.anvillink.domain.RepairMode;
 import io.github.danielxxomg.anvillink.domain.ports.EquipmentPort;
 import java.lang.reflect.Proxy;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -55,37 +53,13 @@ class BukkitEquipmentPortTest {
   @Test
   void viewOf_resolvesHandAndAll_withoutStorage() throws Exception {
     var inv = inventoryWith(Map.of(EquipmentSlotId.MAIN_HAND, 10, EquipmentSlotId.HELMET, 5));
-    // debug to file since testLogging hides stdout
-    String dbg =
-        "mainHand="
-            + inv.getItemInMainHand()
-            + " type="
-            + (inv.getItemInMainHand() == null ? "null" : inv.getItemInMainHand().getType())
-            + " metaNull="
-            + (inv.getItemInMainHand().getItemMeta() == null)
-            + " helmet="
-            + inv.getHelmet()
-            + " serverNull="
-            + (Bukkit.getServer() == null);
-    Files.writeString(Path.of("/tmp/bukkit_debug_view.txt"), dbg);
-    Files.writeString(Path.of("./bukkit_debug_view.txt"), dbg);
     var player = playerWith(inv);
     var port = new BukkitEquipmentPort(uuid -> player);
     var view = port.viewOf(new EquipmentPort.PlayerHandle(player.getUniqueId()));
     assertNotNull(view);
-    String dbg2 =
-        "mainHand isEmpty="
-            + view.itemAt(EquipmentSlotId.MAIN_HAND).isEmpty()
-            + " dmg="
-            + view.itemAt(EquipmentSlotId.MAIN_HAND).damage()
-            + " damageable="
-            + view.itemAt(EquipmentSlotId.MAIN_HAND).isDamageable()
-            + " helmet isEmpty="
-            + view.itemAt(EquipmentSlotId.HELMET).isEmpty();
-    Files.writeString(Path.of("/tmp/bukkit_debug_view2.txt"), dbg2);
-    assertFalse(view.itemAt(EquipmentSlotId.MAIN_HAND).isEmpty(), dbg2);
+    assertFalse(view.itemAt(EquipmentSlotId.MAIN_HAND).isEmpty());
     assertTrue(view.itemAt(EquipmentSlotId.OFF_HAND).isEmpty());
-    assertFalse(view.itemAt(EquipmentSlotId.HELMET).isEmpty(), dbg2);
+    assertFalse(view.itemAt(EquipmentSlotId.HELMET).isEmpty());
     assertTrue(view.itemAt(EquipmentSlotId.STORAGE).isEmpty());
   }
 
@@ -342,12 +316,32 @@ class BukkitEquipmentPortTest {
     }
 
     @Override
+    public boolean hasItemMeta() {
+      return meta != null;
+    }
+
+    @Override
     public int getAmount() {
       return 1;
     }
 
+    @Override
     public boolean isEmpty() {
       return false;
+    }
+
+    @Override
+    public String toString() {
+      return "FakeItemStack{type="
+          + type
+          + ",damage="
+          + (meta instanceof Damageable d ? d.getDamage() : -1)
+          + "}";
+    }
+
+    @Override
+    public ItemStack clone() {
+      return new FakeItemStack(type, meta != null ? meta.clone() : null);
     }
   }
 

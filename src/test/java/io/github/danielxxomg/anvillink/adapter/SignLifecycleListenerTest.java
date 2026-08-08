@@ -285,6 +285,27 @@ class SignLifecycleListenerTest {
       return true;
     }
 
+    @Override
+    public java.util.Collection<org.bukkit.inventory.ItemStack> getDrops(
+        org.bukkit.inventory.ItemStack tool, org.bukkit.entity.Entity entity) {
+      return java.util.List.of();
+    }
+
+    @Override
+    public org.bukkit.block.BlockState copy() {
+      return this;
+    }
+
+    @Override
+    public org.bukkit.block.BlockState copy(org.bukkit.Location loc) {
+      return this;
+    }
+
+    @Override
+    public boolean isSuffocating() {
+      return false;
+    }
+
     // Metadatable
     @Override
     public void setMetadata(String k, org.bukkit.metadata.MetadataValue v) {}
@@ -325,11 +346,47 @@ class SignLifecycleListenerTest {
     public void setEditable(boolean b) {}
 
     @Override
+    public boolean isWaxed() {
+      return false;
+    }
+
+    @Override
+    public void setWaxed(boolean b) {}
+
+    @Override
     public boolean isGlowingText() {
       return false;
     }
 
     @Override
     public void setGlowingText(boolean b) {}
+
+    @Override
+    public org.bukkit.block.sign.SignSide getSide(org.bukkit.block.sign.Side s) {
+      return null;
+    }
+
+    @Override
+    public org.bukkit.block.sign.SignSide getTargetSide(org.bukkit.entity.Player p) {
+      return null;
+    }
+
+    @Override
+    public org.bukkit.entity.Player getAllowedEditor() {
+      return null;
+    }
+
+    @Override
+    public java.util.UUID getAllowedEditorUniqueId() {
+      return null;
+    }
+
+    @Override
+    public void setAllowedEditorUniqueId(java.util.UUID u) {}
+
+    @Override
+    public org.bukkit.block.sign.Side getInteractableSideFor(double x, double z) {
+      return org.bukkit.block.sign.Side.FRONT;
+    }
   }
 }
