@@ -37,6 +37,20 @@ admin:
   # Valid range: 1–32.
   target-distance: 8
 
+# audit — fixed append-only log for paid activations (no config key).
+# Every paid Success(amount!=ZERO) appends one line to
+# plugins/AnvilLink/audit.log (relative to the plugin data folder) via
+# Files.writeString(path, line+"\n", CREATE, APPEND) after getParentFile().mkdirs().
+# Format: ISO_INSTANT|uuid|name|HAND/ALL|world|toPlainString|count|SUCCESS.
+# Only Success(non-zero) is audited; Success(ZERO) and all failures
+# (InsufficientFunds/NoProvider/InvalidResponse/CompensationFailed/RestorationFailed)
+# are never audited. I/O is best-effort double-swallowed (adapter swallows
+# IOException, caller swallows) — audit never blocks transaction/compensation/feedback.
+# File grows unbounded with no auto-rotation or DB in v1; operator rotates by
+# renaming/deleting audit.log (plugin recreates on next paid success via CREATE).
+# Privacy: line contains cleartext UUID + player name; operator owns GDPR
+# retention/deletion. Do NOT share audit.log without scrubbing if required.
+#
 # Reloadable messages (MiniMessage templates). Reload is atomic: an invalid
 # replacement retains the last valid configuration and reports a failure.
 messages:

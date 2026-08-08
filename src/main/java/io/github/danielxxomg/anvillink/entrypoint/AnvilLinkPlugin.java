@@ -6,6 +6,7 @@ import io.github.danielxxomg.anvillink.adapter.AdminCommandHandler;
 import io.github.danielxxomg.anvillink.adapter.BukkitEquipmentPort;
 import io.github.danielxxomg.anvillink.adapter.BukkitFeedbackAdapter;
 import io.github.danielxxomg.anvillink.adapter.BukkitSchedulerAdapter;
+import io.github.danielxxomg.anvillink.adapter.FileAuditAdapter;
 import io.github.danielxxomg.anvillink.adapter.FileConfigurationPort;
 import io.github.danielxxomg.anvillink.adapter.InteractionFilter;
 import io.github.danielxxomg.anvillink.adapter.MiniMessageMessagePort;
@@ -13,6 +14,8 @@ import io.github.danielxxomg.anvillink.adapter.PdcSignIdentity;
 import io.github.danielxxomg.anvillink.adapter.SignLifecycleListener;
 import io.github.danielxxomg.anvillink.adapter.VaultEconomyGateway;
 import io.github.danielxxomg.anvillink.domain.RepairActivation;
+import io.github.danielxxomg.anvillink.domain.TransactionResult;
+import io.github.danielxxomg.anvillink.domain.ports.AuditPort;
 import io.github.danielxxomg.anvillink.domain.ports.EconomyPort;
 import io.github.danielxxomg.anvillink.domain.ports.EquipmentPort;
 import io.github.danielxxomg.anvillink.domain.ports.FeedbackPort;
@@ -22,6 +25,7 @@ import io.github.danielxxomg.anvillink.domain.ports.SchedulerPort;
 import io.github.danielxxomg.anvillink.domain.ports.SignPort;
 import java.io.File;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
@@ -47,6 +51,7 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
   private SignPort signs;
   private RepairActivation activation;
   private FeedbackPort feedback;
+  private AuditPort audit;
 
   @Override
   public void onEnable() {
@@ -68,6 +73,7 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
     economy = new VaultEconomyGateway();
     equipment = new BukkitEquipmentPort(uuid -> Bukkit.getPlayer(uuid));
     feedback = new BukkitFeedbackAdapter(configPort, messagePort, scheduler, Bukkit::getPlayer);
+    audit = new FileAuditAdapter(new File(getDataFolder(), "audit.log"));
     signs = bukkitSignPort();
     OperationalReporter reporter =
         (severity, code, ctx) ->
@@ -121,15 +127,14 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
     }
     var rec = signs.load(id);
     if (rec.isEmpty()) return;
-    // capture worldName on server thread before activation (domain pure String seam)
+    // capture worldName + playerName on server thread before activation (domain pure String seam)
     String worldName = player.getWorld().getName();
+    String playerName = player.getName();
+    io.github.danielxxomg.anvillink.domain.SignRecord loadedRec = rec.orElse(null);
     var result = activation.activate(id, player.getUniqueId(), worldName);
-    if (result
-        instanceof io.github.danielxxomg.anvillink.domain.TransactionResult.InsufficientFunds) {
+    if (result instanceof TransactionResult.InsufficientFunds) {
       player.sendMessage(messagePort.render("insufficient-funds", java.util.Map.of()));
-    } else if (result
-        instanceof io.github.danielxxomg.anvillink.domain.TransactionResult.InvalidResponse ir) {
-      // tampered-text etc -> map to tampered message when applicable
+    } else if (result instanceof TransactionResult.InvalidResponse ir) {
       String reason = ir.reason();
       if (reason != null && reason.contains("tampered-text")) {
         player.sendMessage(messagePort.render("tampered", java.util.Map.of()));
@@ -137,8 +142,7 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
         player.sendMessage(
             messagePort.render("activation-failure", java.util.Map.of("reason", reason)));
       }
-    } else if (result
-        instanceof io.github.danielxxomg.anvillink.domain.TransactionResult.Success s) {
+    } else if (result instanceof TransactionResult.Success s) {
       if (s.amount().compareTo(BigDecimal.ZERO) == 0) {
         player.sendMessage(messagePort.render("no-eligible-items", java.util.Map.of()));
       } else {
@@ -146,6 +150,28 @@ public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
           feedback.play(new SignPort.PlayerId(player.getUniqueId()), s.amount(), s.repairedCount());
         } catch (Exception ignored) {
           // feedback never affects transaction
+        }
+        // audit paid Success after feedback, double-swallow, worldName exact
+        try {
+          if (loadedRec != null) {
+            AuditPort.AuditEntry entry =
+                new AuditPort.AuditEntry(
+                    Instant.now(),
+                    player.getUniqueId(),
+                    playerName,
+                    loadedRec.mode(),
+                    worldName,
+                    s.amount(),
+                    s.repairedCount(),
+                    "SUCCESS");
+            try {
+              audit.record(entry);
+            } catch (Exception ignored) {
+              // adapter swallow + caller double-swallow
+            }
+          }
+        } catch (Exception ignored) {
+          // outer swallow — never affects transaction/feedback
         }
       }
     }
