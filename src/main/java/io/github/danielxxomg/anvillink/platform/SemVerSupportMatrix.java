@@ -12,6 +12,11 @@ import java.util.Properties;
  * SemVer is independent of the compatibility matrix (platform spec: Version and tested range stay
  * distinct). Matrix updates must not bump the SemVer value; version source and matrix source are
  * separate files.
+ *
+ * <p>v0.2.0 BREAKING: per-mode pricing floor 10k (price.hand/price.all mandatory >= 10000, scalar
+ * {@code price: 25.00} invalid). Compatibility matrix unchanged — still Paper 1.18.2 (388/J17)
+ * certified, same 5 mandatory + probe rows in compatibility/evidence.json (see
+ * CompatibilityEvidence); floor note does not alter host/build support.
  */
 public final class SemVerSupportMatrix {
 

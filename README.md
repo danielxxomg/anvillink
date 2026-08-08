@@ -8,7 +8,7 @@ Paid repair signs for Paper servers — players create `[repair]` signs (HAND or
 2. Drop `anvillink-*.jar` into `plugins/`, restart.
 3. Give `anvillink.create` to builders, `anvillink.use` to players (default true), `anvillink.manage` to admins.
 4. Place a sign: line 1 `[repair]`, line 2 `HAND` or `ALL` (case-insensitive) on the front side — it turns blue and registers.
-5. Right-click the sign with the main hand to repair. Economy is charged once (flat price, default `25.00`) on success; otherwise the repair is cancelled and equipment is preserved.
+5. Right-click the sign with the main hand to repair. Economy is charged once (flat per-mode price: `price.hand 12000` / `price.all 25000`, each `>= 10000`) on success; otherwise the repair is cancelled and equipment is preserved.
 
 ## Support tiers (evidence-gated)
 
@@ -83,7 +83,7 @@ GPL-3.0-or-later. See `LICENSE`.
   "applicationCategory": "GameApplication",
   "operatingSystem": "Paper 1.18.2+",
   "license": "https://www.gnu.org/licenses/gpl-3.0.html",
-  "softwareVersion": "0.1.0",
+  "softwareVersion": "0.2.0",
   "url": "https://github.com/danielxxomg/anvillink",
   "description": "Paid repair signs for Minecraft Paper servers — fixed-price HAND/ALL equipment repair via Vault.",
   "author": { "@type": "Person", "name": "danielxxomg" }

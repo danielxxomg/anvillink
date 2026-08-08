@@ -1,18 +1,24 @@
-# AnvilLink default configuration.
+# AnvilLink default configuration (v0.2.0 BREAKING: per-mode pricing + feedback).
 # Reload with /anvillink reload (admin) — see messages below for operator output.
-
-# Fixed price per successful activation, per mode. Both required, each >= 10000.
-# Must be finite and representable at the provider's fractionalDigits. Bare
-# `price: 25.00` scalar is INVALID — use the nested block below.
+#
+# price — mandatory per-mode block, each >= 10000 (MoneyAmount.MIN_PRICE). Both
+# price.hand (HAND, 1 slot) and price.all (ALL, 6 slots) must be present.
+# Bare scalar `price: 25.00` is INVALID and fail-closes (activationEnabled=false
+# at startup; reload retains prior valid config). Values are BigDecimal-exact in
+# this file; VaultEconomyGateway converts via double so representability against
+# the provider's fractionalDigits is validated — display the gateway amount via
+# amount.toPlainString(), not the literal `12000.00` string.
 price:
-  hand: 12000.00 # mandatory >= 10000
-  all: 25000.00 # mandatory >= 10000
+  hand: 12000.00 # mandatory >= 10000 (HAND)
+  all: 25000.00 # mandatory >= 10000 (ALL)
 
-# Global success feedback — consumed after committed Success(non-zero).
+# feedback — global success feedback for committed Success(non-zero). Defaults
+# below are the effective defaults when the block is absent; consumed on server
+# thread via SchedulerPort and swallowed so feedback never triggers compensation.
 feedback:
-  enabled: true
-  sound: BLOCK_ANVIL_USE
-  particles: CRIT
+  enabled: true # default true; false silences sound/particles/message
+  sound: BLOCK_ANVIL_USE # Bukkit Sound id
+  particles: CRIT # Bukkit Particle id
 
 admin:
   # Line-of-sight targeting distance for /anvillink inspect and /anvillink rerender.

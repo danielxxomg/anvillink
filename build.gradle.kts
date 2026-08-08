@@ -5,6 +5,7 @@ plugins {
     `java-library`
     id("com.gradleup.shadow") version "8.3.6"
     id("com.diffplug.spotless") version "6.25.0"
+    jacoco
 }
 
 group = "io.github.danielxxomg"
@@ -110,6 +111,40 @@ tasks.build {
 
 tasks.jar {
     enabled = false // Shadow JAR is the artifact; avoid an empty thin JAR.
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.test)
+    violationRules {
+        rule {
+            limit {
+                minimum = BigDecimal.valueOf(0.75)
+            }
+            // Only enforce 0.75 on domain; entrypoint (AnvilLinkPlugin) is 0% because it
+            // requires a live Paper server and drags overall below 75%.
+            element = "PACKAGE"
+            includes = listOf("io.github.danielxxomg.anvillink.domain*")
+        }
+        rule {
+            element = "BUNDLE"
+            limit {
+                counter = "INSTRUCTION"
+                minimum = BigDecimal.valueOf(0.55)
+            }
+        }
+    }
 }
 
 // Formatting / static checks (source-mutating normalization must finish BEFORE final verification).
