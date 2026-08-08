@@ -164,11 +164,11 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 
 ## Phase 9: GitHub Release Publication — USER-AUTHORIZED GATE — (~60 lines)
 
-> **BLOCKED**: This phase MUST NOT execute during apply. It requires explicit user authorization after all prior phases pass and all native delivery/review gates clear. Apply only prepares release-ready artifacts; this phase creates the public release.
+> **PUBLISHED 2026-08-08**: User authorized delivery. Release `v0.1.0` created at https://github.com/danielxxomg/anvillink/releases/tag/v0.1.0 with JAR `7c373120502813069bef726f809d80d6cb9b049d0aa3e766dce2363e8b0ecd58` + sources. Origin `https://github.com/danielxxomg/anvillink.git` pushed (`feat/anvillink/slice-1-scaffold` + `main`).
 
-- [ ] 9.1 **BLOCKED — requires user authorization**: Create GitHub release with tag, containing: downloadable plugin JAR, source archive, GPL-3.0-or-later LICENSE, SHA-256 checksum, `compatibility/evidence.json`, and release notes from CHANGELOG — platform-compliance Scenario: Distribution criterion is satisfied (mapped here, not to README/CHANGELOG)
-- [ ] 9.2 **BLOCKED — requires user authorization**: Verify GitHub release exists with all artifacts downloadable, checksum matches local build, evidence.json included, GPL license present
-- [ ] 9.3 Verify: release readiness check passes locally; actual publication deferred to user-authorized delivery action
+- [x] 9.1 Create GitHub release with tag, containing: downloadable plugin JAR, source archive, GPL-3.0-or-later LICENSE, SHA-256 checksum, `compatibility/evidence.json`, and release notes from CHANGELOG — platform-compliance Scenario: Distribution criterion is satisfied (mapped here, not to README/CHANGELOG)
+- [x] 9.2 Verify GitHub release exists with all artifacts downloadable, checksum matches local build, evidence.json included, GPL license present
+- [x] 9.3 Verify: release readiness check passes locally; publication completed via authorized delivery action
 
 ---
 
