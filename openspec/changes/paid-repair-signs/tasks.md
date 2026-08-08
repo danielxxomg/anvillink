@@ -67,12 +67,12 @@ The 1,200-line review budget applies **per immutable review candidate/slice**, n
 - [x] 2.2 GREEN: implement `SignParser` with `parse(String line1, String line2)` returning Optional\<ParseResult\>
 - [x] 2.3 RED test `RepairPlannerTest`: HAND→main-hand only, ALL→six slots, excludes storage, skips empty/undamaged/unbreakable/non-Damageable — equipment-repair Scenarios: Mixed targets select only eligible, No eligible target creates no plan, Repeated planning is stable
 - [x] 2.4 GREEN: implement `RepairPlanner` with `plan(mode, equipmentProvider)` returning RepairPlan with ordered PlannedSlot list + snapshots
-- [ ] 2.5 RED test `TransactionResultTest`: success with amount, fail-closed types (no-provider, insufficient-funds, invalid-response, apply-failure), compensation outcomes — repair-economy Scenario: Single withdrawal contract
-- [ ] 2.6 GREEN: implement `TransactionResult` sealed hierarchy (Success, NoProvider, InsufficientFunds, InvalidResponse, ApplyFailure, CompensationSuccess, CompensationFailed, RestorationFailed)
-- [ ] 2.7 RED test `ValidatedPriceTest`: finite non-negative accepted, negative/infinite/precision-overflow rejected, BigDecimal scale check against fractionalDigits
-- [ ] 2.8 GREEN: implement `ValidatedPrice` factory in domain with provider-precision validation
-- [ ] 2.9 Define application port interfaces: `SignPort`, `EquipmentPort`, `EconomyPort`, `SchedulerPort`, `ConfigurationPort`, `MessagePort`, `OperationalReporter` — neutral IDs, BigDecimal, opaque snapshots
-- [ ] 2.10 Verify: `./gradlew test` — all domain tests green, zero Bukkit/Vault imports in `domain` package
+- [x] 2.5 RED test `TransactionResultTest`: success with amount, fail-closed types (no-provider, insufficient-funds, invalid-response, apply-failure), compensation outcomes — repair-economy Scenario: Single withdrawal contract
+- [x] 2.6 GREEN: implement `TransactionResult` sealed hierarchy (Success, NoProvider, InsufficientFunds, InvalidResponse, ApplyFailure, CompensationSuccess, CompensationFailed, RestorationFailed)
+- [x] 2.7 RED test `ValidatedPriceTest`: finite non-negative accepted, negative/infinite/precision-overflow rejected, BigDecimal scale check against fractionalDigits
+- [x] 2.8 GREEN: implement `ValidatedPrice` factory in domain with provider-precision validation
+- [x] 2.9 Define application port interfaces: `SignPort`, `EquipmentPort`, `EconomyPort`, `SchedulerPort`, `ConfigurationPort`, `MessagePort`, `OperationalReporter` — neutral IDs, BigDecimal, opaque snapshots
+- [x] 2.10 Verify: `./gradlew test` — all domain tests green, zero Bukkit/Vault imports in `domain` package
 
 ## Phase 3: Ports, Activation + Compensation Use Case (TDD) — PR 3 (~335 lines)
 

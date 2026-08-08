@@ -184,3 +184,50 @@ for slice 1, or chain to PR 2 planning once PR 1 is reviewed.
 | `domain/RepairPlannerTest.java` | 148 | RED→GREEN 35 err→6 PASS |
 
 **Evidence**: `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew test` → 35 PASS (17+12+6), `spotlessCheck` PASS, `build` PASS, `grep Bukkit/Vault domain` → NO MATCH. Rollback: delete slice-2a 9 files + revert tasks 2.1–2.4.
+
+---
+
+## Slice 2b — Transaction Types + ValidatedPrice + Ports (2.5–2.10) — 2026-08-07
+
+**Work unit**: `slice-2b-transaction-ports` (attempt `sha256:7ce5c9aae765c61258a1c090f2628daeae414009ba41820d0a79847b826384ea`, auto-chain / feature-branch-chain)
+**Boundary**: 2.5–2.10 only (TransactionResult, ValidatedPrice, 7 ports). 2.1–2.4 already in slice 2a.
+**Budget**: 384 lines src+test (≤400), plus ≤80 docs (tasks.md 6-line checkbox flip + this section). Total authored 390; no size exception.
+**Chain strategy**: feature-branch-chain — PR 2 slice-2b branch stacks on slice-2a / tracker `feat/anvillink/slice-1-scaffold`, never `main`.
+
+- [x] 2.5 RED `TransactionResultTest` → GREEN (7 tests; success, 4 fail-closed, compensation, sealed=8)
+- [x] 2.6 `TransactionResult` sealed hierarchy (8 permits: Success/NoProvider/InsufficientFunds/InvalidResponse/ApplyFailure/CompensationSuccess/CompensationFailed/RestorationFailed) — pure domain
+- [x] 2.7 RED `ValidatedPriceTest` → GREEN (7 tests; finite/negative/infinite/precision/scale/null)
+- [x] 2.8 `ValidatedPrice` factory (MoneyAmount + fractionalDigits scale check; -1=unlimited)
+- [x] 2.9 Ports: `SignPort`, `EquipmentPort`, `EconomyPort`, `SchedulerPort`, `ConfigurationPort`, `MessagePort`, `OperationalReporter` — all `domain.ports`, neutral IDs, BigDecimal, opaque snapshots, zero Bukkit/Vault/Adventure types
+- [x] 2.10 Verify: `GRADLE_USER_HOME="$PWD/.gradle" mise x java@21.0.2 -- ./gradlew cleanTest test` → 49 PASS (0 fail), `spotlessCheck` PASS, `build` PASS, `grep Bukkit/Vault domain` → PASS pure-domain
+
+**Slice 2b files (384 lines, 9 prod + 2 test)**:
+
+| File | Lines | Note |
+|------|-------|------|
+| `domain/TransactionResult.java` | 32 | sealed 8-permit hierarchy |
+| `domain/ValidatedPrice.java` | 42 | provider-precision factory |
+| `domain/ports/SignPort.java` | 34 | SignId/PlayerId/FrontText |
+| `domain/ports/EquipmentPort.java` | 35 | PlayerHandle/PlannedApply/ApplyOutcome |
+| `domain/ports/EconomyPort.java` | 35 | Withdrawal/Deposit sealed |
+| `domain/ports/SchedulerPort.java` | 10 | runOnServerThread |
+| `domain/ports/ConfigurationPort.java` | 25 | ConfigSnapshot/ReloadOutcome |
+| `domain/ports/MessagePort.java` | 10 | String render only |
+| `domain/ports/OperationalReporter.java` | 27 | Severity/EventContext |
+| `domain/TransactionResultTest.java` | 68 | RED compile-fail → 7 PASS |
+| `domain/ValidatedPriceTest.java` | 66 | RED compile-fail → 7 PASS |
+
+**Host-API purity**: `grep -R "org.bukkit|net.milkbowl|net.kyori|io.papermc" src/main/java/.../domain` → no matches. `MessagePort` returns `String` only; `EconomyPort` uses `BigDecimal`+`UUID`; all ports use neutral IDs.
+
+**RED→GREEN evidence**:
+
+| Test | RED | GREEN | Notes |
+|------|-----|-------|-------|
+| TransactionResultTest | 16 compilation errors (missing type) | PASS 7 | verified before implementing TransactionResult |
+| ValidatedPriceTest | 36 compilation errors (missing type) | PASS 7 | verified before implementing ValidatedPrice |
+
+**Reconciliation (forecast vs actual)**: Phase 2 forecast ~315 lines aggregated; slice 2a 343 + slice 2b 384 = 727 actual for Phase 2. Forecast under-counted: 7 ports (~250 lines) live in Phase 2 tasks 2.9 and were not in the per-phase line forecast breakdown (ports counted toward Phase 3 in aggregate text); the two compensated splits keep each slice ≤400 and independently reviewable. No budget exceeded for this work unit.
+
+**Rollback boundary**: delete `domain/TransactionResult.java`, `domain/ValidatedPrice.java`, `domain/ports/*.java` (7 files), `domain/TransactionResultTest.java`, `domain/ValidatedPriceTest.java`; revert tasks 2.5–2.10 `[x]`→`[ ]`; truncate this section. No Phase 3+ files affected.
+
+**Full Phase 2 status**: 2.1–2.10 COMPLETE (10/10). Next: Phase 3 (RepairActivation + Compensation use case).
