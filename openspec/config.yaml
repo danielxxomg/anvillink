@@ -1,0 +1,67 @@
+# openspec/config.yaml — plugin-repair SDD configuration
+schema: spec-driven
+
+context: |
+  Project: plugin-repair
+  Stack: Java 17 / Gradle 8.14.3 / Paper API 1.18.2 + VaultAPI 1.7 (compileOnly) — Minecraft plugin (Paper/Spigot), confirmed.
+  Architecture: Hexagonal — pure `domain` core (RepairMode, EquipmentSlotId, MoneyAmount, SignRecord) with adapters in later phases.
+  Testing: JUnit 5 test runner now established (Gradle). MockBukkit integration planned for Phase 7.
+  Style: Spotless google-java-format 1.17 + ktlint 1.0.1; GPL-3.0-or-later license headers.
+
+strict_tdd: false
+
+testing:
+  strict_tdd: false
+  detected: "2026-08-06"
+  runner:
+    available: true
+    command: "./gradlew test"
+    framework: "JUnit 5"
+  layers:
+    unit:
+      available: true
+      tool: "JUnit 5"
+    integration:
+      available: false
+      tool: "MockBukkit (planned Phase 7; pin corrected to 4.x line)"
+    e2e:
+      available: false
+      tool: "Real Paper smoke tests (planned Phase 7/8)"
+  coverage:
+    available: false
+    command: "—"           # Will be ./gradlew jacocoTestReport
+  quality:
+    linter:
+      available: true
+      command: "./gradlew spotlessCheck"
+    type_checker:
+      available: false
+      command: "N/A — Java static typing"
+    formatter:
+      available: true
+      command: "./gradlew spotlessApply"
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Confirm Minecraft server platform (Paper/Spigot/Vanilla) if applicable
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    guidelines:
+      - Follow existing code patterns once established
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: ""
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
