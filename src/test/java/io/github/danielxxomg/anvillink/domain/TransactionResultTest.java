@@ -4,6 +4,7 @@ package io.github.danielxxomg.anvillink.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -12,11 +13,35 @@ import org.junit.jupiter.api.Test;
 class TransactionResultTest {
 
   @Test
-  void successCarriesAmount() {
-    TransactionResult result = new TransactionResult.Success(new BigDecimal("25.00"));
+  void successCarriesAmountAndRepairedCount() {
+    TransactionResult result = new TransactionResult.Success(new BigDecimal("20000"), 3);
     assertInstanceOf(TransactionResult.Success.class, result);
-    assertEquals(new BigDecimal("25.00"), ((TransactionResult.Success) result).amount());
+    assertEquals(new BigDecimal("20000"), ((TransactionResult.Success) result).amount());
+    assertEquals(3, ((TransactionResult.Success) result).repairedCount());
     assertInstanceOf(TransactionResult.class, result);
+  }
+
+  @Test
+  void successZeroCarriesZeroCount() {
+    TransactionResult result = new TransactionResult.Success(BigDecimal.ZERO, 0);
+    assertEquals(BigDecimal.ZERO, ((TransactionResult.Success) result).amount());
+    assertEquals(0, ((TransactionResult.Success) result).repairedCount());
+  }
+
+  @Test
+  void successEqualityIsValueBased() {
+    TransactionResult a = new TransactionResult.Success(new BigDecimal("20000"), 3);
+    TransactionResult b = new TransactionResult.Success(new BigDecimal("20000"), 3);
+    TransactionResult c = new TransactionResult.Success(new BigDecimal("20000"), 2);
+    assertEquals(a, b);
+    assertTrue(!a.equals(c));
+  }
+
+  @Test
+  void successRejectsNullAmountAndNegativeCount() {
+    assertThrows(IllegalArgumentException.class, () -> new TransactionResult.Success(null, 1));
+    assertThrows(
+        IllegalArgumentException.class, () -> new TransactionResult.Success(BigDecimal.ZERO, -1));
   }
 
   @Test

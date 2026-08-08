@@ -46,17 +46,18 @@ public final class RepairActivation {
     var cfg = config.current();
     if (cfg == null || !cfg.activationEnabled())
       return new TransactionResult.InvalidResponse("activation-disabled");
+    BigDecimal selected = rec.get().mode() == RepairMode.HAND ? cfg.priceHand() : cfg.priceAll();
     ValidatedPrice price;
     try {
-      price = ValidatedPrice.of(cfg.price(), economy.fractionalDigits());
+      price = ValidatedPrice.of(selected, economy.fractionalDigits());
     } catch (IllegalArgumentException e) {
       return new TransactionResult.InvalidResponse("invalid-price:" + e.getMessage());
     }
     var handle = new EquipmentPort.PlayerHandle(player);
     var view = equipment.viewOf(handle);
-    if (view == null) return new TransactionResult.Success(BigDecimal.ZERO);
+    if (view == null) return new TransactionResult.Success(BigDecimal.ZERO, 0);
     var plan = planner.plan(rec.get().mode(), view);
-    if (plan.isEmpty()) return new TransactionResult.Success(BigDecimal.ZERO);
+    if (plan.isEmpty()) return new TransactionResult.Success(BigDecimal.ZERO, 0);
     var planned =
         plan.slots().stream()
             .map(s -> new EquipmentPort.PlannedApply(s.slot(), s.snapshot()))
@@ -70,8 +71,9 @@ public final class RepairActivation {
       return new TransactionResult.InvalidResponse(ir.reason());
     var withdrawn = ((EconomyPort.Withdrawal.Success) w).amountWithdrawn();
     var out = new TransactionResult[1];
-    scheduler.runOnServerThread(() -> apply(handle, planned, id, player, amount, withdrawn, out));
-    return out[0] != null ? out[0] : new TransactionResult.Success(withdrawn);
+    scheduler.runOnServerThread(
+        () -> apply(handle, planned, id, player, amount, withdrawn, out, planned.size()));
+    return out[0] != null ? out[0] : new TransactionResult.Success(withdrawn, planned.size());
   }
 
   private void apply(
@@ -81,10 +83,11 @@ public final class RepairActivation {
       UUID player,
       BigDecimal amount,
       BigDecimal withdrawn,
-      TransactionResult[] out) {
+      TransactionResult[] out,
+      int repairedCount) {
     var o = equipment.applyRepair(h, planned);
     if (o instanceof EquipmentPort.ApplyOutcome.Success) {
-      out[0] = new TransactionResult.Success(withdrawn);
+      out[0] = new TransactionResult.Success(withdrawn, repairedCount);
       return;
     }
     var pf = (EquipmentPort.ApplyOutcome.PartialFailure) o;

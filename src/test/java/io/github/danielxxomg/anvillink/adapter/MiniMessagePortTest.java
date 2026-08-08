@@ -16,10 +16,14 @@ class MiniMessagePortTest {
   void render_returnsBukkitStringWithPlaceholder() {
     ConfigurationPort.ConfigSnapshot snap =
         new ConfigurationPort.ConfigSnapshot(
-            new java.math.BigDecimal("25.00"),
+            new java.math.BigDecimal("12000.00"),
+            new java.math.BigDecimal("25000.00"),
             8,
             Map.of("greeting", "<green>Hello <white>{name}</white></green>"),
-            true);
+            true,
+            true,
+            "BLOCK_ANVIL_USE",
+            "CRIT");
     MessagePort port = new MiniMessageMessagePort(() -> snap);
     String out = port.render("greeting", Map.of("name", "Ada"));
     assertNotNull(out);
@@ -63,7 +67,15 @@ class MiniMessagePortTest {
   @Test
   void unknownTemplate_returnsKey() {
     ConfigurationPort.ConfigSnapshot snap =
-        new ConfigurationPort.ConfigSnapshot(new java.math.BigDecimal("25.00"), 8, Map.of(), true);
+        new ConfigurationPort.ConfigSnapshot(
+            new java.math.BigDecimal("12000.00"),
+            new java.math.BigDecimal("25000.00"),
+            8,
+            Map.of(),
+            true,
+            true,
+            "BLOCK_ANVIL_USE",
+            "CRIT");
     MessagePort port = new MiniMessageMessagePort(() -> snap);
     String out = port.render("missing", Map.of());
     assertNotNull(out);

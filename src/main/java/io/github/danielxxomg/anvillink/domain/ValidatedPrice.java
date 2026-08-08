@@ -14,6 +14,9 @@ public record ValidatedPrice(MoneyAmount amount, int fractionalDigits) {
     if (amount == null) {
       throw new IllegalArgumentException("amount must not be null");
     }
+    if (amount.value().compareTo(MoneyAmount.MIN_PRICE) < 0) {
+      throw new IllegalArgumentException("price below floor: " + amount.value());
+    }
     if (!amount.representableAt(fractionalDigits)) {
       throw new IllegalArgumentException(
           "amount scale "

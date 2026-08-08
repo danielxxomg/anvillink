@@ -70,7 +70,9 @@ class SignIntegrationTest {
       throws Exception {
     // config valid
     File cfg =
-        writeConfig(temp, "price: 25.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
+        writeConfig(
+            temp,
+            "price:\n  hand: 12000.00\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
     FileConfigurationPort config = new FileConfigurationPort(cfg);
     List<Double> withdrawals = new ArrayList<>();
     Economy eco = economySuccess(2, 100.0, withdrawals);
@@ -134,10 +136,10 @@ class SignIntegrationTest {
         new io.github.danielxxomg.anvillink.domain.RepairPlanner();
     var plan = planner.plan(RepairMode.HAND, view);
     assertEquals(1, plan.slots().size());
-    var w = gateway.withdraw(player.getUniqueId(), new BigDecimal("25.00"));
+    var w = gateway.withdraw(player.getUniqueId(), new BigDecimal("12000.00"));
     assertInstanceOf(EconomyPort.Withdrawal.Success.class, w);
     assertEquals(1, withdrawals.size());
-    assertEquals(25.0, withdrawals.get(0));
+    assertEquals(12000.0, withdrawals.get(0));
     // apply via equipment port (scheduler is mocked as sync)
     var planned =
         plan.slots().stream()
@@ -222,7 +224,10 @@ class SignIntegrationTest {
     }
     // Now activation via RepairActivation must fail closed
     Path tmp = Files.createTempDirectory("anvillink-tamper");
-    File cfg = writeConfig(tmp, "price: 25.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
+    File cfg =
+        writeConfig(
+            tmp,
+            "price:\n  hand: 12000.00\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
     FileConfigurationPort config = new FileConfigurationPort(cfg);
     List<Double> withdrawals = new ArrayList<>();
     Economy eco = economySuccess(2, 200.0, withdrawals);
@@ -323,7 +328,9 @@ class SignIntegrationTest {
   @Test
   void noEligibleItems_noVaultCall(@TempDir Path temp) throws Exception {
     File cfg =
-        writeConfig(temp, "price: 25.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
+        writeConfig(
+            temp,
+            "price:\n  hand: 12000.00\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
     FileConfigurationPort config = new FileConfigurationPort(cfg);
     List<Double> withdrawals = new ArrayList<>();
     Economy eco = economySuccess(2, 100.0, withdrawals);
@@ -375,7 +382,9 @@ class SignIntegrationTest {
   @Test
   void insufficientFunds_noRepair(@TempDir Path temp) throws Exception {
     File cfg =
-        writeConfig(temp, "price: 25.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
+        writeConfig(
+            temp,
+            "price:\n  hand: 12000.00\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
     FileConfigurationPort config = new FileConfigurationPort(cfg);
     Economy eco =
         (Economy)
@@ -484,7 +493,7 @@ class SignIntegrationTest {
     // only main would charge; verify single call
     try {
       var gw = new VaultEconomyGateway(() -> server);
-      gw.withdraw(p.getUniqueId(), new BigDecimal("25.00"));
+      gw.withdraw(p.getUniqueId(), new BigDecimal("12000.00"));
       assertEquals(1, withdrawals.size());
     } finally {
       // off-hand never enters gate — no second withdraw
@@ -497,7 +506,9 @@ class SignIntegrationTest {
   @Test
   void vaultAbsent_noProvider(@TempDir Path temp) throws Exception {
     File cfg =
-        writeConfig(temp, "price: 25.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
+        writeConfig(
+            temp,
+            "price:\n  hand: 12000.00\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
     FileConfigurationPort config = new FileConfigurationPort(cfg);
     // no economy registered
     PlayerMock creator = server.addPlayer("vault-creator");
@@ -563,11 +574,15 @@ class SignIntegrationTest {
         new ConfigurationPort() {
           ConfigurationPort.ConfigSnapshot snap =
               new ConfigurationPort.ConfigSnapshot(
-                  new BigDecimal("25.00"),
+                  new BigDecimal("12000.00"),
+                  new BigDecimal("25000.00"),
                   8,
                   java.util.Map.of(
                       "tampered", "tampered", "reload-success", "ok", "rerender-success", "ok"),
-                  true);
+                  true,
+                  true,
+                  "BLOCK_ANVIL_USE",
+                  "CRIT");
 
           public ConfigSnapshot current() {
             return snap;
@@ -608,26 +623,28 @@ class SignIntegrationTest {
   @Test
   void reloadValidSwapsInvalidRetains(@TempDir Path temp) throws Exception {
     File cfg =
-        writeConfig(temp, "price: 25.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
+        writeConfig(
+            temp,
+            "price:\n  hand: 12000.00\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n");
     FileConfigurationPort port = new FileConfigurationPort(cfg);
-    assertEquals(new BigDecimal("25.00"), port.current().price());
+    assertEquals(new BigDecimal("12000.00"), port.current().priceHand());
     assertEquals(8, port.current().targetDistance());
     Files.writeString(
         cfg.toPath(),
-        "price: 50.00\nadmin:\n  target-distance: 12\nmessages:\n  g: bye\n",
+        "price:\n  hand: 15000.00\n  all: 30000.00\nadmin:\n  target-distance: 12\nmessages:\n  g: bye\n",
         StandardCharsets.UTF_8);
     var ok = port.reload();
     assertInstanceOf(ConfigurationPort.ReloadOutcome.Success.class, ok);
-    assertEquals(new BigDecimal("50.00"), port.current().price());
+    assertEquals(new BigDecimal("30000.00"), port.current().priceAll());
     assertEquals(12, port.current().targetDistance());
     Files.writeString(
         cfg.toPath(),
-        "price: -5.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n",
+        "price:\n  hand: 9999.99\n  all: 25000.00\nadmin:\n  target-distance: 8\nmessages:\n  g: hi\n",
         StandardCharsets.UTF_8);
     var fail = port.reload();
     assertInstanceOf(ConfigurationPort.ReloadOutcome.Failure.class, fail);
     assertEquals(
-        new BigDecimal("50.00"), port.current().price(), "invalid reload must retain prior");
+        new BigDecimal("15000.00"), port.current().priceHand(), "invalid reload must retain prior");
   }
 
   // --- helpers ---

@@ -13,6 +13,8 @@ import java.math.BigDecimal;
  */
 public record MoneyAmount(BigDecimal value) {
 
+  public static final BigDecimal MIN_PRICE = new BigDecimal("10000");
+
   public MoneyAmount {
     if (value == null) {
       throw new IllegalArgumentException("amount must not be null");
@@ -24,6 +26,9 @@ public record MoneyAmount(BigDecimal value) {
       value.doubleValue(); // throws NumberFormatException on NaN/Infinity
     } catch (NumberFormatException e) {
       throw new IllegalArgumentException("amount must be finite: " + value);
+    }
+    if (value.compareTo(MIN_PRICE) < 0) {
+      throw new IllegalArgumentException("price below floor: " + value);
     }
   }
 

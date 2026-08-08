@@ -271,7 +271,15 @@ class AdminCommandTest {
 
   private ConfigurationPort configWith(int distance) {
     ConfigurationPort.ConfigSnapshot snap =
-        new ConfigurationPort.ConfigSnapshot(new BigDecimal("25.00"), distance, Map.of(), true);
+        new ConfigurationPort.ConfigSnapshot(
+            new BigDecimal("12000.00"),
+            new BigDecimal("25000.00"),
+            distance,
+            Map.of(),
+            true,
+            true,
+            "BLOCK_ANVIL_USE",
+            "CRIT");
     return new ConfigurationPort() {
       ConfigurationPort.ConfigSnapshot cur = snap;
 

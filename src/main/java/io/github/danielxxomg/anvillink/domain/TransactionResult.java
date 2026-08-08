@@ -14,7 +14,20 @@ public sealed interface TransactionResult
         TransactionResult.CompensationSuccess,
         TransactionResult.CompensationFailed,
         TransactionResult.RestorationFailed {
-  record Success(BigDecimal amount) implements TransactionResult {}
+  /**
+   * Successful repair — carries withdrawn amount and slots repaired. Use {@code repairedCount} for
+   * {@code {count}} and {@code amount.toPlainString()} for {@code {price}} in feedback.
+   */
+  record Success(BigDecimal amount, int repairedCount) implements TransactionResult {
+    public Success {
+      if (amount == null) {
+        throw new IllegalArgumentException("amount must not be null");
+      }
+      if (repairedCount < 0) {
+        throw new IllegalArgumentException("repairedCount must be >= 0: " + repairedCount);
+      }
+    }
+  }
 
   record NoProvider() implements TransactionResult {}
 

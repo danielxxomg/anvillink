@@ -1,10 +1,18 @@
 # AnvilLink default configuration.
 # Reload with /anvillink reload (admin) — see messages below for operator output.
 
-# Fixed price per successful activation, in the provider's currency.
-# Must be finite and non-negative; precision is validated against the
-# configured economy provider (invalid values fail closed).
-price: 25.00
+# Fixed price per successful activation, per mode. Both required, each >= 10000.
+# Must be finite and representable at the provider's fractionalDigits. Bare
+# `price: 25.00` scalar is INVALID — use the nested block below.
+price:
+  hand: 12000.00 # mandatory >= 10000
+  all: 25000.00 # mandatory >= 10000
+
+# Global success feedback — consumed after committed Success(non-zero).
+feedback:
+  enabled: true
+  sound: BLOCK_ANVIL_USE
+  particles: CRIT
 
 admin:
   # Line-of-sight targeting distance for /anvillink inspect and /anvillink rerender.
@@ -27,3 +35,4 @@ messages:
   activation-failure: "<red>Repair failed: <white>{reason}</white></red>"
   no-eligible-items: "<yellow>No damaged repairable items to repair.</yellow>"
   insufficient-funds: "<red>You do not have enough funds.</red>"
+  repair-success: "<green>Repaired {count} items for {price}.</green>"

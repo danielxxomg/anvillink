@@ -45,14 +45,96 @@ class RepairActivationTest {
   }
 
   @Test
-  void flatCharge_oneWithdrawal_25() {
-    var f = Fixture.allSlots();
+  void handWithdrawsPriceHand() {
+    var f = Fixture.with(Map.of(EquipmentSlotId.MAIN_HAND, 10));
+    f.cfg.hand = new BigDecimal("12000.00");
+    f.cfg.all = new BigDecimal("25000.00");
     var r = f.act().activate(f.signId, f.pid);
     assertInstanceOf(TransactionResult.Success.class, r);
-    assertEquals(new BigDecimal("25.00"), ((TransactionResult.Success) r).amount());
+    assertEquals(new BigDecimal("12000.00"), ((TransactionResult.Success) r).amount());
     assertEquals(1, f.eco.withdrawCalls);
-    assertEquals(new BigDecimal("25.00"), f.eco.lastWithdraw);
-    assertEquals(1, f.eq.applyCalls);
+    assertEquals(new BigDecimal("12000.00"), f.eco.lastWithdraw);
+    assertEquals(1, ((TransactionResult.Success) r).repairedCount());
+  }
+
+  @Test
+  void allWithdrawsPriceAll() {
+    var f = Fixture.allSlots();
+    f.cfg.hand = new BigDecimal("12000.00");
+    f.cfg.all = new BigDecimal("25000.00");
+    f.eco.withdraw = new EconomyPort.Withdrawal.Success(new BigDecimal("25000.00"));
+    var r = f.act().activate(f.signId, f.pid);
+    assertInstanceOf(TransactionResult.Success.class, r);
+    assertEquals(new BigDecimal("25000.00"), ((TransactionResult.Success) r).amount());
+    assertEquals(new BigDecimal("25000.00"), f.eco.lastWithdraw);
+    assertEquals(6, ((TransactionResult.Success) r).repairedCount());
+  }
+
+  @Test
+  void handPrecisionOverflow_failsClosedNoWithdrawal() {
+    var f = Fixture.with(Map.of(EquipmentSlotId.MAIN_HAND, 10));
+    f.cfg.hand = new BigDecimal("10000.001");
+    f.cfg.all = new BigDecimal("25000.00");
+    var r = f.act().activate(f.signId, f.pid);
+    assertInstanceOf(TransactionResult.InvalidResponse.class, r);
+    assertTrue(((TransactionResult.InvalidResponse) r).reason().contains("invalid-price"));
+    assertEquals(0, f.eco.withdrawCalls);
+  }
+
+  @Test
+  void allPrecisionOverflow_doesNotAffectHand() {
+    var f = Fixture.with(Map.of(EquipmentSlotId.MAIN_HAND, 10));
+    f.cfg.all = new BigDecimal("10000.001");
+    f.cfg.hand = new BigDecimal("12000.00");
+    // HAND mode should still succeed despite ALL being bad
+    var r = f.act().activate(f.signId, f.pid);
+    assertInstanceOf(TransactionResult.Success.class, r);
+    assertEquals(new BigDecimal("12000.00"), f.eco.lastWithdraw);
+  }
+
+  @Test
+  void emptyPlan_successZeroNoWithdrawal() {
+    var f = Fixture.with(Map.of());
+    f.cfg.hand = new BigDecimal("12000.00");
+    f.cfg.all = new BigDecimal("25000.00");
+    var r = f.act().activate(f.signId, f.pid);
+    assertInstanceOf(TransactionResult.Success.class, r);
+    assertEquals(0, ((TransactionResult.Success) r).amount().compareTo(BigDecimal.ZERO));
+    assertEquals(0, ((TransactionResult.Success) r).repairedCount());
+    assertEquals(0, f.eco.withdrawCalls);
+  }
+
+  @Test
+  void allThreeSlots_successCountMatchesPlanned() {
+    // Build a view with exactly 3 damaged slots for ALL (use fixture that returns 3)
+    var f = new Fixture();
+    f.sign.load = Optional.of(SignRecord.create(RepairMode.ALL, UUID.randomUUID()));
+    f.sign.front = Optional.of(new SignPort.FrontText("[repair]", "ALL"));
+    // main hand + helmet + chest damaged, rest empty
+    f.eq.view =
+        s -> {
+          if (s == EquipmentSlotId.MAIN_HAND) return Fixture.item(10);
+          if (s == EquipmentSlotId.HELMET) return Fixture.item(5);
+          if (s == EquipmentSlotId.CHESTPLATE) return Fixture.item(6);
+          return new StubItem(true, false, 0, false);
+        };
+    f.cfg.hand = new BigDecimal("12000.00");
+    f.cfg.all = new BigDecimal("20000");
+    f.eco.withdraw = new EconomyPort.Withdrawal.Success(new BigDecimal("20000"));
+    var r = f.act().activate(f.signId, f.pid);
+    assertInstanceOf(TransactionResult.Success.class, r);
+    assertEquals(new BigDecimal("20000"), ((TransactionResult.Success) r).amount());
+    assertEquals(3, ((TransactionResult.Success) r).repairedCount());
+  }
+
+  @Test
+  void singleWithdrawal_enforced_perMode() {
+    var f = Fixture.allSlots();
+    f.cfg.hand = new BigDecimal("12000.00");
+    f.cfg.all = new BigDecimal("25000.00");
+    f.eco.withdraw = new EconomyPort.Withdrawal.Success(new BigDecimal("25000.00"));
+    f.act().activate(f.signId, f.pid);
+    assertEquals(1, f.eco.withdrawCalls);
   }
 
   @Test
@@ -179,8 +261,8 @@ class RepairActivationTest {
   static final class StubEco implements EconomyPort {
     int withdrawCalls, depositCalls;
     BigDecimal lastWithdraw;
-    Withdrawal withdraw = new Withdrawal.Success(new BigDecimal("25.00"));
-    Deposit deposit = new Deposit.Success(new BigDecimal("25.00"));
+    Withdrawal withdraw = new Withdrawal.Success(new BigDecimal("12000.00"));
+    Deposit deposit = new Deposit.Success(new BigDecimal("12000.00"));
 
     public Withdrawal withdraw(UUID id, BigDecimal a) {
       withdrawCalls++;
@@ -199,8 +281,11 @@ class RepairActivationTest {
   }
 
   static final class StubCfg implements ConfigurationPort {
+    BigDecimal hand = new BigDecimal("12000.00");
+    BigDecimal all = new BigDecimal("25000.00");
+
     public ConfigSnapshot current() {
-      return new ConfigSnapshot(new BigDecimal("25.00"), 8, Map.of(), true);
+      return new ConfigSnapshot(hand, all, 8, Map.of(), true, true, "BLOCK_ANVIL_USE", "CRIT");
     }
 
     public ReloadOutcome reload() {
