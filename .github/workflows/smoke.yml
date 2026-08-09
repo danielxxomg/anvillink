@@ -37,6 +37,11 @@ jobs:
             jdkMajor: 21
             continue-on-error: false
           - distribution: Paper
+            version: "1.21.5"
+            build: "114"
+            jdkMajor: 21
+            continue-on-error: false
+          - distribution: Paper
             version: "26.2"
             build: "102"
             jdkMajor: 25

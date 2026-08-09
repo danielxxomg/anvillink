@@ -46,6 +46,15 @@
   },
   {
     "distribution": "Paper",
+    "version": "1.21.5",
+    "build": "114",
+    "serverSha256": "6666666666666666666666666666666666666666666666666666666666666666",
+    "jdkMajor": 21,
+    "testSuite": "smoke",
+    "result": "pass"
+  },
+  {
+    "distribution": "Paper",
     "version": "26.2",
     "build": "102",
     "serverSha256": "5555555555555555555555555555555555555555555555555555555555555555",

@@ -20,4 +20,8 @@ jobs:
         if: always()
         run: |
           unzip -p build/libs/anvillink-*.jar plugin.yml | head -n 5
+          jar tf build/libs/anvillink-*.jar | grep -q "io/github/danielxxomg/anvillink/libs/kyori/adventure/text/serializer/legacy/LegacyComponentSerializer" || (echo "missing relocated legacy serializer" && exit 1)
+          if jar tf build/libs/anvillink-*.jar | grep -q "^net/kyori"; then echo "unrelocated net/kyori present" && exit 1; fi
+          if jar tf build/libs/anvillink-*.jar | grep -q "^org/bukkit"; then echo "host org/bukkit packaged" && exit 1; fi
+          if jar tf build/libs/anvillink-*.jar | grep -q "^net/minecraft/server"; then echo "host net/minecraft packaged" && exit 1; fi
           jar tf build/libs/anvillink-*.jar | grep -c "paper\|vault" || true
