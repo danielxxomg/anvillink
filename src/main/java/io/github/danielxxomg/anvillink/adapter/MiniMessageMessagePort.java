@@ -41,7 +41,12 @@ public final class MiniMessageMessagePort implements MessagePort {
     try {
       Component component = MiniMessage.miniMessage().deserialize(withPlaceholders);
       return LegacyComponentSerializer.legacySection().serialize(component);
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      // Paper 1.21.5 ships Adventure 4.17+ on the host classpath; shaded Adventure
+      // 4.11.0 is relocated to io.github...libs.kyori. If legacy/gson serializers are
+      // excluded from relocation their serialize(Component) would still reference host
+      // net.kyori...Component, causing NoSuchMethodError / linkage Errors at runtime.
+      // Catch Throwable so any Error falls back to the raw MiniMessage string.
       return withPlaceholders;
     }
   }

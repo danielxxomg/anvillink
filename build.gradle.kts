@@ -61,6 +61,7 @@ dependencies {
 
     // Adventure (MiniMessage) IS shaded/relocated (design: pin 4.11.0, relocate).
     implementation(libs.adventure.minimessage)
+    implementation(libs.adventure.legacy)
 
     // Tests: JUnit 5 platform. MockBukkit 4.110.0 on the 1.21 line (JDK 21 test runtime).
     // Paper 1.21.11 artifact provides Folia types (threadedregions) required by MockBukkit 4.x at runtime.
@@ -94,10 +95,7 @@ tasks.shadowJar {
     archiveBaseName.set("anvillink")
     archiveClassifier.set("")
     minimize()
-    relocate("net.kyori", "io.github.danielxxomg.anvillink.libs.kyori") {
-        exclude("net.kyori.adventure.text.serializer.gson.**")
-        exclude("net.kyori.adventure.text.serializer.legacy.**")
-    }
+    relocate("net.kyori", "io.github.danielxxomg.anvillink.libs.kyori")
     // Host APIs must never be packaged.
     dependencies {
         exclude(dependency("io.papermc.paper:paper-api"))
