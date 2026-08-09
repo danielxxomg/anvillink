@@ -113,6 +113,62 @@ class FileConfigurationPortTest {
   }
 
   @Test
+  void defaultConfigInlineComments_accepted(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    // shipped resource has `hand: 12000.00 # mandatory` inline comments — must stay valid
+    String shipped =
+        java.nio.file.Files.readString(
+            java.nio.file.Path.of("src/main/resources/config.yml"),
+            java.nio.charset.StandardCharsets.UTF_8);
+    write(file, shipped);
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    assertTrue(
+        port.current().activationEnabled(),
+        "shipped config.yml with inline comments must be valid (regression: gens host invalid startup)");
+    assertEquals(new BigDecimal("12000.00"), port.current().priceHand());
+    assertEquals(new BigDecimal("25000.00"), port.current().priceAll());
+  }
+
+  @Test
+  void inlineCommentOnPrice_isStripped(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    write(
+        file,
+        "price:\n  hand: 12000.00 # inline\n  all: 25000.00 # inline\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    assertTrue(port.current().activationEnabled());
+    assertEquals(new BigDecimal("12000.00"), port.current().priceHand());
+    assertEquals(new BigDecimal("25000.00"), port.current().priceAll());
+  }
+
+  @Test
+  void inlineCommentOnWorldPrice_isStripped(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    write(
+        file,
+        "price:\n  hand: 12000.00\n  all: 25000.00\n"
+            + "worlds:\n  world:\n    hand: 5000 # over\n    all: 1000 # over\n"
+            + "admin:\n  target-distance: 8\nmessages:\n  g: \"hi\"\n");
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    assertTrue(port.current().activationEnabled());
+    assertEquals(new BigDecimal("5000"), port.current().worldPrices().get("world").hand());
+  }
+
+  @Test
+  void quotedHashNotStripped(@TempDir Path temp) throws Exception {
+    Path file = temp.resolve("config.yml");
+    write(
+        file,
+        "price:\n  hand: 12000.00\n  all: 25000.00\n"
+            + "admin:\n  target-distance: 8\n"
+            + "messages:\n  g: \"a # b\"\n");
+    FileConfigurationPort port = new FileConfigurationPort(file.toFile());
+    assertTrue(port.current().activationEnabled());
+    assertEquals("a # b", port.current().messages().get("g"));
+  }
+
+  @Test
   void bareScalarPrice_rejectedWithMissingHand(@TempDir Path temp) throws Exception {
     Path file = temp.resolve("config.yml");
     write(

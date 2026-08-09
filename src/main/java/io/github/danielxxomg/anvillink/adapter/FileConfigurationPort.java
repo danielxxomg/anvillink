@@ -114,7 +114,8 @@ public final class FileConfigurationPort implements ConfigurationPort {
         inWorld = false;
         currentWorld = null;
         if (trimmed.startsWith("price:")) {
-          String after = stripQuotes(trimmed.substring("price:".length()).trim());
+          String after =
+              stripQuotes(stripInlineComment(trimmed.substring("price:".length()).trim()));
           if (!after.isEmpty()) {
             priceScalarPresent = true;
           } else {
@@ -122,7 +123,8 @@ public final class FileConfigurationPort implements ConfigurationPort {
             inPrice = true;
           }
         } else if (trimmed.startsWith("worlds:")) {
-          String after = stripQuotes(trimmed.substring("worlds:".length()).trim());
+          String after =
+              stripQuotes(stripInlineComment(trimmed.substring("worlds:".length()).trim()));
           if (!after.isEmpty()) {
             // worlds: scalar is invalid shape; warn ignore? spec says worlds optional block
             // treat non-empty as invalid worlds scalar -> fail whole file
@@ -135,14 +137,17 @@ public final class FileConfigurationPort implements ConfigurationPort {
         } else if (trimmed.startsWith("messages:")) {
           inMessages = true;
         } else if (trimmed.startsWith("feedback:")) {
-          String after = stripQuotes(trimmed.substring("feedback:".length()).trim());
+          String after =
+              stripQuotes(stripInlineComment(trimmed.substring("feedback:".length()).trim()));
           if (after.isEmpty()) {
             inFeedback = true;
           }
         } else if (trimmed.equals("admin:")) {
           inAdmin = true;
         } else if (trimmed.startsWith("admin.target-distance:")) {
-          distanceRaw = stripQuotes(trimmed.substring("admin.target-distance:".length()).trim());
+          distanceRaw =
+              stripQuotes(
+                  stripInlineComment(trimmed.substring("admin.target-distance:".length()).trim()));
         }
       } else {
         if (inWorlds) {
@@ -156,7 +161,7 @@ public final class FileConfigurationPort implements ConfigurationPort {
               continue;
             }
             String worldNameRaw = trimmed.substring(0, colon).trim();
-            String after = stripQuotes(trimmed.substring(colon + 1).trim());
+            String after = stripQuotes(stripInlineComment(trimmed.substring(colon + 1).trim()));
             String worldName = stripWorldName(worldNameRaw);
             if (worldName.isEmpty()) {
               LOG.warning("worlds: empty world name ignored");
@@ -192,7 +197,8 @@ public final class FileConfigurationPort implements ConfigurationPort {
               continue;
             }
             String k = trimmed.substring(0, colon).trim();
-            String v = stripQuotes(trimmed.substring(colon + 1).trim());
+            String v = stripQuotes(stripInlineComment(trimmed.substring(colon + 1).trim()));
+            if (v != null && v.isEmpty()) v = "";
             if (k.equals("hand") || k.equals("all")) {
               Map<String, String> m = worldsRaw.get(currentWorld);
               if (m.containsKey(k)) {
@@ -210,28 +216,35 @@ public final class FileConfigurationPort implements ConfigurationPort {
           int colon = trimmed.indexOf(':');
           if (colon > 0) {
             String k = trimmed.substring(0, colon).trim();
-            String v = stripQuotes(trimmed.substring(colon + 1).trim());
+            String v = stripQuotes(stripInlineComment(trimmed.substring(colon + 1).trim()));
             if (!k.isEmpty()) messages.put(k, v);
           }
         } else if (inPrice) {
           if (trimmed.startsWith("hand:")) {
-            priceHandRaw = stripQuotes(trimmed.substring("hand:".length()).trim());
+            priceHandRaw =
+                stripQuotes(stripInlineComment(trimmed.substring("hand:".length()).trim()));
             if (priceHandRaw != null && priceHandRaw.isEmpty()) priceHandRaw = null;
           } else if (trimmed.startsWith("all:")) {
-            priceAllRaw = stripQuotes(trimmed.substring("all:".length()).trim());
+            priceAllRaw =
+                stripQuotes(stripInlineComment(trimmed.substring("all:".length()).trim()));
             if (priceAllRaw != null && priceAllRaw.isEmpty()) priceAllRaw = null;
           }
         } else if (inFeedback) {
           if (trimmed.startsWith("enabled:")) {
-            feedbackEnabledRaw = stripQuotes(trimmed.substring("enabled:".length()).trim());
+            feedbackEnabledRaw =
+                stripQuotes(stripInlineComment(trimmed.substring("enabled:".length()).trim()));
           } else if (trimmed.startsWith("sound:")) {
-            feedbackSoundRaw = stripQuotes(trimmed.substring("sound:".length()).trim());
+            feedbackSoundRaw =
+                stripQuotes(stripInlineComment(trimmed.substring("sound:".length()).trim()));
           } else if (trimmed.startsWith("particles:")) {
-            feedbackParticlesRaw = stripQuotes(trimmed.substring("particles:".length()).trim());
+            feedbackParticlesRaw =
+                stripQuotes(stripInlineComment(trimmed.substring("particles:".length()).trim()));
           }
         } else if (inAdmin) {
           if (trimmed.startsWith("target-distance:")) {
-            distanceRaw = stripQuotes(trimmed.substring("target-distance:".length()).trim());
+            distanceRaw =
+                stripQuotes(
+                    stripInlineComment(trimmed.substring("target-distance:".length()).trim()));
           }
         }
       }
@@ -372,6 +385,25 @@ public final class FileConfigurationPort implements ConfigurationPort {
     if (s.length() >= 2
         && ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'")))) {
       return s.substring(1, s.length() - 1);
+    }
+    return s;
+  }
+
+  private static String stripInlineComment(String s) {
+    if (s == null || s.isEmpty()) return s;
+    boolean inSingle = false;
+    boolean inDouble = false;
+    for (int i = 0; i < s.length(); i++) {
+      char c = s.charAt(i);
+      if (c == '\'' && !inDouble) {
+        inSingle = !inSingle;
+      } else if (c == '"' && !inSingle) {
+        inDouble = !inDouble;
+      } else if (c == '#' && !inSingle && !inDouble) {
+        if (i == 0 || s.charAt(i - 1) == ' ' || s.charAt(i - 1) == '\t') {
+          return s.substring(0, i).trim();
+        }
+      }
     }
     return s;
   }

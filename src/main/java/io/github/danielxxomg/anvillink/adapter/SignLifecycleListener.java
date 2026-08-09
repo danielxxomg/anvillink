@@ -44,8 +44,27 @@ public final class SignLifecycleListener implements Listener {
       RepairMode mode = parsed.get().mode();
       event.setLine(0, "[repair]");
       event.setLine(1, mode.name());
-      // persist PDC + color on TileState after commit
-      if (state instanceof TileState ts) {
+      // persist PDC + color. On Paper 1.21+, the snapshot from before setLine is stale
+      // and setColor(DyeColor) targets the legacy field — also mirror canonical lines
+      // onto the TileState so any post-event line coalescing does not lose them.
+      // PDC+color are written to a fresh state so they survive Bukkit's copy.
+      BlockState fresh = event.getBlock().getState();
+      boolean wrote = false;
+      if (fresh instanceof TileState ts) {
+        PdcSignIdentity.write(ts, SignRecord.create(mode, player.getUniqueId()));
+        if (ts instanceof Sign sign) {
+          sign.setColor(DyeColor.BLUE);
+          try {
+            sign.setLine(0, "[repair]");
+            sign.setLine(1, mode.name());
+          } catch (Throwable ignored) {
+          }
+        }
+        ts.update(true, false);
+        wrote = true;
+      }
+      if (!wrote && state instanceof TileState ts) {
+        // fallback for test doubles where fresh is not TileState but original is
         PdcSignIdentity.write(ts, SignRecord.create(mode, player.getUniqueId()));
         if (ts instanceof Sign sign) sign.setColor(DyeColor.BLUE);
         ts.update(true, false);
