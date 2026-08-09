@@ -41,7 +41,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /** Entrypoint: wires adapters, registers listeners, loads config. */
-public final class AnvilLinkPlugin extends JavaPlugin implements Listener {
+public class AnvilLinkPlugin extends JavaPlugin implements Listener {
 
   private FileConfigurationPort configPort;
   private MessagePort messagePort;

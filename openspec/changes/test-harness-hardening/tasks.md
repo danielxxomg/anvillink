@@ -49,24 +49,24 @@ Gate `mise x java@21.0.2 -- ./gradlew clean test spotlessCheck build`. Harness U
 
 ### Fase 4: PluginBootstrapTest
 
-- [ ] 4.1 RED `MockBukkit.mock()+MockBukkit.load(AnvilLinkPlugin.class)`→`getDataFolder()` exists
-- [ ] 4.2 GREEN `onEnable` wires `FileConfigurationPort(new File(getDataFolder(),"config.yml"))`; PDC `danielxxomg:anvillink_repair_sign`
-- [ ] 4.3 RED `callEvent(SignChangeEvent(...,"[repair]","HAND"))`→`block.getState()` PDC+`BLUE`+`update(true,false)`
-- [ ] 4.4 GREEN `fresh=block.getState()` after `setLine`→`TileState` `wrote=true`
-- [ ] 4.5 RED fallback `if (!wrote && state instanceof TileState)` `fresh` not TileState via `state`
-- [ ] 4.6 GREEN proxy-state `update(true,false)` fallback
-- [ ] 4.7 RED both non-TileState→no PDC
+- [x] 4.1 RED `MockBukkit.mock()+MockBukkit.load(AnvilLinkPlugin.class)`→`getDataFolder()` exists
+- [x] 4.2 GREEN `onEnable` wires `FileConfigurationPort(new File(getDataFolder(),"config.yml"))`; PDC `danielxxomg:anvillink_repair_sign`
+- [x] 4.3 RED `callEvent(SignChangeEvent(...,"[repair]","HAND"))`→`block.getState()` PDC+`BLUE`+`update(true,false)`
+- [x] 4.4 GREEN `fresh=block.getState()` after `setLine`→`TileState` `wrote=true`
+- [x] 4.5 RED fallback `if (!wrote && state instanceof TileState)` `fresh` not TileState via `state`
+- [x] 4.6 GREEN proxy-state `update(true,false)` fallback
+- [x] 4.7 RED both non-TileState→no PDC
 
 ### Fase 5: Vault+audit
 
-- [ ] 5.1 RED `PlayerInteractEvent` via `callEvent` `Proxy` Vault `fractionalDigits` 0/2/-1
-- [ ] 5.2 GREEN `0` no withdraw; `2`/`-1` withdraw
-- [ ] 5.3 RED tampered text→`InvalidResponse` no charge/audit
-- [ ] 5.4 RED only `Success(non-zero)`→`ISO_INSTANT|uuid|name|HAND|world|toPlainString|count|SUCCESS` to temp `audit.log` (`CREATE|APPEND`,`mkdirs()`)
-- [ ] 5.5 GREEN `FileAuditAdapter` swallows `IOException`, `toPlainString`
-- [ ] 5.6 `OffHand` single, `InsufficientFunds`/`NoProvider`/`NoEligibleItems` via `callEvent` no Vault
-- [ ] 5.7 edit/break without `manage`→cancelled, PDC unchanged
-- [ ] 5.8 Verify `PluginBootstrapTest` gate+`jar tf ... | grep -q libs/kyori/legacy`
+- [x] 5.1 RED `PlayerInteractEvent` via `callEvent` `Proxy` Vault `fractionalDigits` 0/2/-1
+- [x] 5.2 GREEN `0` no withdraw; `2`/`-1` withdraw
+- [x] 5.3 RED tampered text→`InvalidResponse` no charge/audit
+- [x] 5.4 RED only `Success(non-zero)`→`ISO_INSTANT|uuid|name|HAND|world|toPlainString|count|SUCCESS` to temp `audit.log` (`CREATE|APPEND`,`mkdirs()`)
+- [x] 5.5 GREEN `FileAuditAdapter` swallows `IOException`, `toPlainString`
+- [x] 5.6 `OffHand` single, `InsufficientFunds`/`NoProvider`/`NoEligibleItems` via `callEvent` no Vault
+- [x] 5.7 edit/break without `manage`→cancelled, PDC unchanged
+- [x] 5.8 Verify `PluginBootstrapTest` gate+`jar tf ... | grep -q libs/kyori/legacy`
 
 ## Trace
 
@@ -83,6 +83,6 @@ Gate `mise x java@21.0.2 -- ./gradlew clean test spotlessCheck build`. Harness U
 
 ## Gates
 
-- [ ] `jar tf | grep -q libs/kyori/legacy`+`! grep -q "^net/kyori"`+`! grep -q "org/bukkit\|net/minecraft"`
-- [ ] Shipped `config.yml` via `File`+`catch(Throwable)` fallback
-- [ ] `MockBukkit.load(AnvilLinkPlugin.class)`+`callEvent` both TileState+Vault 0/2/-1+temp `audit.log`
+- [x] `jar tf | grep -q libs/kyori/legacy`+`! grep -q "^net/kyori"`+`! grep -q "org/bukkit\|net/minecraft"`
+- [x] Shipped `config.yml` via `File`+`catch(Throwable)` fallback
+- [x] `MockBukkit.load(AnvilLinkPlugin.class)`+`callEvent` both TileState+Vault 0/2/-1+temp `audit.log`
