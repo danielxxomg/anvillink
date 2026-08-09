@@ -5,6 +5,14 @@ All notable changes to AnvilLink will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] — 2026-08-08 — fix inline comments + Paper 1.21.5 Adventure + sign blue (PATCH)
+
+### Fixed
+
+- `FileConfigurationPort` failed on shipped defaults (`price.hand: 12000.00 # mandatory >= 0`) because inline `# comment` was fed to `BigDecimal` — added quote-aware `stripInlineComment` (` #` outside quotes) for `price.*`, `worlds.*`, `feedback.*`, `admin.target-distance`, `messages.*`; quoted `"a # b"` preserved. Also reports `activationEnabled=false` no longer occurs for valid shipped config on Paper 1.21.5-114/Java 25 where `gens:` hot.
+- `MiniMessageMessagePort.render` threw `NoSuchMethodError: LegacyComponentSerializer.serialize(Component)` on Paper 1.21.5 (host Adventure 4.17+ vs shaded 4.11.0) — shaded `adventure-text-serializer-legacy`/`gson` were excluded from relocation so `Component` types mismatched; also `catch Exception` missed `Error`. Now relocates all `net.kyori` (removed `exclude gson/legacy`), adds `implementation(net.kyori:adventure-text-serializer-legacy)`, adsorbed into `libs.kyori` and guarded with `catch Throwable` fallback to raw string. Shadow JAR now includes 9 `legacy/` classes (557K vs 533K).
+- `SignLifecycleListener` lost PDC + `DyeColor.BLUE` on Paper 1.21.5 because it wrote to the stale `BlockState` snapshot before `event.setLine`; now mirrors `[repair]`/`HAND|ALL` onto fresh `event.getBlock().getState()` `TileState` before `update(true,false)`. New `FileConfigurationPortTest` cases: `defaultConfigInlineComments_accepted`, `inlineCommentOnPrice_isStripped`, etc.
+
 ## [0.3.0] — 2026-08-08 — BREAKING per-world pricing + floor >=0 + audit log (MAJOR)
 
 ### BREAKING

@@ -92,7 +92,7 @@ GPL-3.0-or-later. See `LICENSE`.
   "applicationCategory": "GameApplication",
   "operatingSystem": "Paper 1.18.2+",
   "license": "https://www.gnu.org/licenses/gpl-3.0.html",
-  "softwareVersion": "0.3.0",
+  "softwareVersion": "0.3.1",
   "url": "https://github.com/danielxxomg/anvillink",
   "description": "Paid repair signs for Minecraft Paper servers — fixed-price HAND/ALL equipment repair via Vault.",
   "author": { "@type": "Person", "name": "danielxxomg" }
